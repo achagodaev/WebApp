@@ -1,0 +1,142 @@
+﻿@model WebApp.UI.ViewModels.OrderProductAddressProductionDateViewModels.AddSizeToOrderProductAddressProductionDateViewModel
+@using WebApp.UI.Controllers
+
+@{
+    ViewBag.Title = $"{Html.DisplayNameFor(model => model.OrderProductAddressProductionDate)}. {Html.DisplayNameForModel()}";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>@Html.DisplayNameFor(model => model.OrderProductAddressProductionDate) <small>@Html.DisplayNameForModel()</small></h4>
+        <hr />
+
+        <ol class="breadcrumb">
+            <li>
+                @Html.ActionLink("Заказы", nameof(OrdersController.Index),
+                    nameof(OrdersController).Replace("Controller", ""))
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Order.Name,
+                    nameof(OrdersController.Details),
+                    nameof(OrdersController).Replace("Controller", ""),
+                    new { id = Model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Order.Id },
+                    null)
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Product.Name,
+                    nameof(OrderProductsController.Details),
+                    nameof(OrderProductsController).Replace("Controller", ""),
+                    new
+                    {
+                        orderId = Model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Order.Id,
+                        productId = Model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Product.Id
+                    },
+                    null)
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddressProductionDate.OrderProductAddress.Address.Name,
+                    nameof(OrderProductAddressesController.Details),
+                    nameof(OrderProductAddressesController).Replace("Controller", ""),
+                    new
+                    {
+                        orderId = Model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Order.Id,
+                        productId = Model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Product.Id,
+                        addressId = Model.OrderProductAddressProductionDate.OrderProductAddress.Address.Id
+                    },
+                    null)
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddressProductionDate.ProductionDate.ToShortDateString(),
+                    nameof(OrderProductAddressProductionDatesController.Details),
+                    new
+                    {
+                        orderId = Model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Order.Id,
+                        productId = Model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Product.Id,
+                        addressId = Model.OrderProductAddressProductionDate.OrderProductAddress.Address.Id,
+                        productionDate = Model.OrderProductAddressProductionDate.ProductionDate
+                    })
+            </li>
+            <li>
+                @Html.ActionLink("Редактирование",
+                    nameof(OrderProductAddressProductionDatesController.Edit),
+                    new
+                    {
+                        orderId = Model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Order.Id,
+                        productId = Model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Product.Id,
+                        addressId = Model.OrderProductAddressProductionDate.OrderProductAddress.Address.Id,
+                        productionDate = Model.OrderProductAddressProductionDate.ProductionDate
+                    })
+            </li>
+            <li class="active">
+                @Html.DisplayNameForModel()
+            </li>
+        </ol>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                @Html.HiddenFor(model => model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Order.Id)
+                @Html.HiddenFor(model => model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Product.Id)
+                @Html.HiddenFor(model => model.OrderProductAddressProductionDate.OrderProductAddress.Address.Id)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Order, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Order.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Product, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.OrderProductAddressProductionDate.OrderProductAddress.OrderProduct.Product.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.OrderProductAddressProductionDate.OrderProductAddress.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.OrderProductAddressProductionDate.OrderProductAddress.Address.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.OrderProductAddressProductionDate.ProductionDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.OrderProductAddressProductionDate.ProductionDate, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SizeId, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.SizeId, Model.AvailableSizes, "Выберите размер", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.SizeId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Quantity, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Quantity, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Добавить" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

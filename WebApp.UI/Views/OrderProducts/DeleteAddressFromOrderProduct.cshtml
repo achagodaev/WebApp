@@ -1,0 +1,85 @@
+﻿@model WebApp.UI.ViewModels.OrderProductViewModels.DeleteAddressFromOrderProductViewModel
+@using WebApp.UI.Controllers
+
+@{
+    ViewBag.Title = "Продукция заказа. Удаление грузополучателя";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Продукция заказа <small>Удаление грузополучателя</small></h4>
+        <hr />
+
+        <ol class="breadcrumb">
+            <li>
+                @Html.ActionLink("Заказы", nameof(OrdersController.Index),
+                    nameof(OrdersController).Replace("Controller", ""))
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProduct.Order.Name,
+                    nameof(OrdersController.Details),
+                    nameof(OrdersController).Replace("Controller", ""),
+                    new { id = Model.OrderProduct.Order.Id }, null)
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProduct.Product.Name,
+                    nameof(OrderProductsController.Details),
+                    new
+                    {
+                        orderId = Model.OrderProduct.Order.Id,
+                        productId = Model.OrderProduct.Product.Id
+                    })
+            </li>
+            <li>
+                @Html.ActionLink("Редактирование",
+                    nameof(OrderProductsController.Edit),
+                    new
+                    {
+                        orderId = Model.OrderProduct.Order.Id,
+                        productId = Model.OrderProduct.Product.Id
+                    })
+            </li>
+            <li class="active">Удаление грузополучателя</li>
+        </ol>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                @Html.HiddenFor(model => model.OrderProduct.Order.Id)
+                @Html.HiddenFor(model => model.OrderProduct.Product.Id)
+                @Html.HiddenFor(model => model.Address.Id)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.OrderProduct.Order, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.OrderProduct.Order.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.OrderProduct.Product, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.OrderProduct.Product.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Address.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Удалить" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

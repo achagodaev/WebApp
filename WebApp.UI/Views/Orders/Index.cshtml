@@ -1,0 +1,67 @@
+﻿@model IEnumerable<WebApp.UI.ViewModels.OrderViewModels.OrderViewModel>
+@using WebApp.UI.Controllers
+
+@{
+    ViewBag.Title = "Заказы";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Заказы</h4>
+        <hr />
+
+        <ol class="breadcrumb">
+            <li class="active">Заказы</li>
+        </ol>
+
+        <p>
+            @Html.ActionLink("Создать", nameof(OrdersController.Create))
+        </p>
+
+        <table class="table table-condensed table-bordered">
+            @if (Model.Any())
+            {
+                <tr class="active">
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th></th>
+                </tr>
+
+                foreach (var order in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => order.Name)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Подробная информация",
+                                nameof(OrdersController.Details),
+                                new { id = order.Id }) |
+                            @Html.ActionLink("Удалить",
+                                nameof(OrdersController.Delete),
+                                new { id = order.Id })
+                        </td>
+                    </tr>
+                }
+
+                <tr class="active">
+                    <th colspan="2">
+                        Всего: @Model.Count()
+                    </th>
+                </tr>
+            }
+            else
+            {
+                <tr class="active">
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                </tr>
+                <tr class="active">
+                    <td>Нет заказов</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

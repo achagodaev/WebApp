@@ -1,0 +1,160 @@
+﻿@model WebApp.UI.ViewModels.OrderProductAddressProductionDateViewModels.OrderProductAddressProductionDateViewModel
+@using WebApp.UI.Controllers
+
+@{
+    ViewBag.Title = "Дата производства продукции грузополучателя заказа. Подробная информация";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Дата производства продукции грузополучателя заказа <small>Подробная информация</small></h4>
+        <hr />
+
+        <ol class="breadcrumb">
+            <li>
+                @Html.ActionLink("Заказы", nameof(OrdersController.Index),
+                    nameof(OrdersController).Replace("Controller", ""))
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddress.OrderProduct.Order.Name,
+                    nameof(OrdersController.Details),
+                    nameof(OrdersController).Replace("Controller", ""),
+                    new { id = Model.OrderProductAddress.OrderProduct.Order.Id },
+                    null)
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddress.OrderProduct.Product.Name,
+                    nameof(OrderProductsController.Details),
+                    nameof(OrderProductsController).Replace("Controller", ""),
+                    new
+                    {
+                        orderId = Model.OrderProductAddress.OrderProduct.Order.Id,
+                        productId = Model.OrderProductAddress.OrderProduct.Product.Id
+                    },
+                    null)
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddress.Address.Name,
+                    nameof(OrderProductAddressesController.Details),
+                    nameof(OrderProductAddressesController).Replace("Controller", ""),
+                    new
+                    {
+                        orderId = Model.OrderProductAddress.OrderProduct.Order.Id,
+                        productId = Model.OrderProductAddress.OrderProduct.Product.Id,
+                        addressId = Model.OrderProductAddress.Address.Id
+                    },
+                    null)
+            </li>
+            <li class="active">
+                @Model.ProductionDate.ToShortDateString()
+            </li>
+        </ol>
+
+        <p>
+            @Html.ActionLink("Редактировать", nameof(OrderProductAddressProductionDatesController.Edit),
+                new
+                {
+                    orderId = Model.OrderProductAddress.OrderProduct.Order.Id,
+                    productId = Model.OrderProductAddress.OrderProduct.Product.Id,
+                    addressId = Model.OrderProductAddress.Address.Id,
+                    productionDate = Model.ProductionDate
+                })
+        </p>
+
+        <hr />
+
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddress.OrderProduct.Order, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrderProductAddress.OrderProduct.Order.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddress.OrderProduct.Product, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrderProductAddress.OrderProduct.Product.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddress.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrderProductAddress.Address.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ProductionDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.ProductionDate, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddressProductionDateSizes, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <table class="table table-condensed table-bordered">
+                        @if (Model.OrderProductAddressProductionDateSizes.Any())
+                        {
+                            <tr class="active">
+                                <th>Размер</th>
+                                <th>Количество</th>
+                                <th></th>
+                            </tr>
+
+                            foreach (var orderProductAddressProductionDateSize in Model.OrderProductAddressProductionDateSizes)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => orderProductAddressProductionDateSize.Size.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => orderProductAddressProductionDateSize.Quantity)
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink("Подробная информация",
+                                            nameof(OrderProductAddressProductionDateSizesController.Details),
+                                            nameof(OrderProductAddressProductionDateSizesController).Replace("Controller", ""),
+                                            new
+                                            {
+                                                orderId = Model.OrderProductAddress.OrderProduct.Order.Id,
+                                                productId = Model.OrderProductAddress.OrderProduct.Product.Id,
+                                                addressId = Model.OrderProductAddress.Address.Id,
+                                                productionDate = Model.ProductionDate,
+                                                sizeId = orderProductAddressProductionDateSize.Size.Id
+                                            },
+                                            null)
+                                    </td>
+                                </tr>
+                            }
+
+                            <tr class="active">
+                                <th>
+                                    Всего: @Model.OrderProductAddressProductionDateSizes.Count()
+                                </th>
+                                <th>
+                                    Всего: @Model.OrderProductAddressProductionDateSizes.Sum(oaps => oaps.Quantity)
+                                </th>
+                                <th></th>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr class="active">
+                                <th>Размер</th>
+                                <th>Количество</th>
+                            </tr>
+                            <tr class="active">
+                                <td colspan="2">Нет размерных данных</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

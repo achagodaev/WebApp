@@ -1,0 +1,67 @@
+﻿@model IEnumerable<WebApp.UI.ViewModels.CustomerViewModels.CustomerViewModel>
+@using WebApp.UI.Controllers
+
+@{
+    ViewBag.Title = "Заказчики";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Заказчики</h4>
+        <hr />
+
+        <ol class="breadcrumb">
+            <li class="active">Заказчики</li>
+        </ol>
+
+        <p>
+            @Html.ActionLink("Создать", nameof(CustomersController.Create))
+        </p>
+
+        <table class="table table-condensed table-bordered">
+            @if (Model.Any())
+            {
+                <tr class="active">
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th></th>
+                </tr>
+
+                foreach (var customer in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => customer.Name)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Подробная информация",
+                                nameof(CustomersController.Details),
+                                new { id = customer.Id }) |
+                            @Html.ActionLink("Удалить",
+                                nameof(CustomersController.Delete),
+                                new { id = customer.Id })
+                        </td>
+                    </tr>
+                }
+
+                <tr class="active">
+                    <th colspan="2">
+                        Всего: @Model.Count()
+                    </th>
+                </tr>
+            }
+            else
+            {
+                <tr class="active">
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                </tr>
+                <tr class="active">
+                    <td>Нет заказчиков</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

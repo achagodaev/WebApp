@@ -1,0 +1,67 @@
+﻿@model IEnumerable<WebApp.UI.ViewModels.SupplierViewModels.SupplierViewModel>
+@using WebApp.UI.Controllers
+
+@{
+    ViewBag.Title = "Поставщики";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Поставщики</h4>
+        <hr />
+
+        <ol class="breadcrumb">
+            <li class="active">Поставщики</li>
+        </ol>
+
+        <p>
+            @Html.ActionLink("Создать", nameof(SuppliersController.Create))
+        </p>
+
+        <table class="table table-condensed table-bordered">
+            @if (Model.Any())
+            {
+                <tr class="active">
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th></th>
+                </tr>
+
+                foreach (var supplier in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => supplier.Name)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Подробная информация",
+                                nameof(SuppliersController.Details),
+                                new { id = supplier.Id }) |
+                            @Html.ActionLink("Удалить",
+                                nameof(SuppliersController.Delete),
+                                new { id = supplier.Id })
+                        </td>
+                    </tr>
+                }
+
+                <tr class="active">
+                    <th colspan="2">
+                        Всего: @Model.Count()
+                    </th>
+                </tr>
+            }
+            else
+            {
+                <tr class="active">
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                </tr>
+                <tr class="active">
+                    <td>Нет поставщиков</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

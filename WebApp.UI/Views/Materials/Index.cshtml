@@ -1,0 +1,67 @@
+﻿@model IEnumerable<WebApp.UI.ViewModels.MaterialViewModels.MaterialViewModel>
+@using WebApp.UI.Controllers
+
+@{
+    ViewBag.Title = "Материалы";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Материалы</h4>
+        <hr />
+
+        <ol class="breadcrumb">
+            <li class="active">Материалы</li>
+        </ol>
+
+        <p>
+            @Html.ActionLink("Создать", nameof(MaterialsController.Create))
+        </p>
+
+        <table class="table table-condensed table-bordered">
+            @if (Model.Any())
+            {
+                <tr class="active">
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th></th>
+                </tr>
+
+                foreach (var address in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => address.Name)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Подробная информация",
+                                nameof(MaterialsController.Details),
+                                new { id = address.Id }) |
+                            @Html.ActionLink("Удалить",
+                                nameof(MaterialsController.Delete),
+                                new { id = address.Id })
+                        </td>
+                    </tr>
+                }
+
+                <tr class="active">
+                    <th colspan="2">
+                        Всего: @Model.Count()
+                    </th>
+                </tr>
+            }
+            else
+            {
+                <tr class="active">
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                </tr>
+                <tr class="active">
+                    <td>Нет материалов</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

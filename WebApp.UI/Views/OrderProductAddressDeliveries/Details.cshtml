@@ -1,0 +1,239 @@
+﻿@model WebApp.UI.ViewModels.OrderProductAddressDeliveryViewModels.OrderProductAddressDeliveryViewModel
+@using WebApp.UI.Controllers
+
+@{
+    ViewBag.Title = "Поставка готовой продукции грузополучателя заказа. Подробная информация";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Поставка готовой продукции грузополучателя заказа <small>Подробная информация</small></h4>
+        <hr />
+
+        <ol class="breadcrumb">
+            <li>
+                @Html.ActionLink("Заказы", nameof(OrdersController.Index),
+                    nameof(OrdersController).Replace("Controller", ""))
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddress.OrderProduct.Order.Name,
+                    nameof(OrdersController.Details),
+                    nameof(OrdersController).Replace("Controller", ""),
+                    new { id = Model.OrderProductAddress.OrderProduct.Order.Id },
+                    null)
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddress.OrderProduct.Product.Name,
+                    nameof(OrderProductsController.Details),
+                    nameof(OrderProductsController).Replace("Controller", ""),
+                    new
+                    {
+                        orderId = Model.OrderProductAddress.OrderProduct.Order.Id,
+                        productId = Model.OrderProductAddress.OrderProduct.Product.Id
+                    },
+                    null)
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddress.Address.Name,
+                    nameof(OrderProductAddressesController.Details),
+                    nameof(OrderProductAddressesController).Replace("Controller", ""),
+                    new
+                    {
+                        orderId = Model.OrderProductAddress.OrderProduct.Order.Id,
+                        productId = Model.OrderProductAddress.OrderProduct.Product.Id,
+                        addressId = Model.OrderProductAddress.Address.Id
+                    },
+                    null)
+            </li>
+            <li class="active">
+                Поставка готовой продукции @Model.DeliveryId
+            </li>
+        </ol>
+
+        <p>
+            @Html.ActionLink("Редактировать", nameof(OrderProductAddressDeliveriesController.Edit),
+                new
+                {
+                    orderId = Model.OrderProductAddress.OrderProduct.Order.Id,
+                    productId = Model.OrderProductAddress.OrderProduct.Product.Id,
+                    addressId = Model.OrderProductAddress.Address.Id,
+                    deliveryId = Model.DeliveryId
+                })
+        </p>
+
+        <hr />
+
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddress.OrderProduct.Order, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrderProductAddress.OrderProduct.Order.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddress.OrderProduct.Product, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrderProductAddress.OrderProduct.Product.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddress.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrderProductAddress.Address.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DeliveryId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.DeliveryId, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DeliveryDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.DeliveryDate, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DeliveryImagePath, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @if (Model.DeliveryImagePath != null)
+                    {
+                        <p class="form-control-static">
+                            @Html.ActionLink(Model.DeliveryImagePath,
+                                nameof(FilesController.GetImage),
+                                nameof(FilesController).Replace("Controller", ""),
+                                new { path = Model.DeliveryImagePath },
+                                new { target = "_blank" })
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="form-control-static">
+                            Нет изображения
+                        </p>
+                    }
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AcceptanceId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.AcceptanceId, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AcceptanceDate, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.AcceptanceDate, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AcceptanceImagePath, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @if (Model.AcceptanceImagePath != null)
+                    {
+                        <p class="form-control-static">
+                            @Html.ActionLink(Model.AcceptanceImagePath,
+                                nameof(FilesController.GetImage),
+                                nameof(FilesController).Replace("Controller", ""),
+                                new { path = Model.AcceptanceImagePath },
+                                new { target = "_blank" })
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="form-control-static">
+                            Нет изображения
+                        </p>
+                    }
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddressDeliverySizes, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <table class="table table-condensed table-bordered">
+                        @if (Model.OrderProductAddressDeliverySizes.Any())
+                        {
+                            <tr class="active">
+                                <th>Размер</th>
+                                <th>Поставка. Количество</th>
+                                <th>Приемка. Количество</th>
+                                <th></th>
+                            </tr>
+
+                            foreach (var orderProductAddressDeliverySize in Model.OrderProductAddressDeliverySizes)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => orderProductAddressDeliverySize.Size.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => orderProductAddressDeliverySize.DeliveryQuantity)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => orderProductAddressDeliverySize.AcceptanceQuantity)
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink("Подробная информация",
+                                            nameof(OrderProductAddressDeliverySizesController.Details),
+                                            nameof(OrderProductAddressDeliverySizesController).Replace("Controller", ""),
+                                            new
+                                            {
+                                                orderId = Model.OrderProductAddress.OrderProduct.Order.Id,
+                                                productId = Model.OrderProductAddress.OrderProduct.Product.Id,
+                                                addressId = Model.OrderProductAddress.Address.Id,
+                                                deliveryId = Model.DeliveryId,
+                                                sizeId = orderProductAddressDeliverySize.Size.Id
+                                            },
+                                            null)
+                                    </td>
+                                </tr>
+                            }
+
+                            <tr class="active">
+                                <th>
+                                    Всего: @Model.OrderProductAddressDeliverySizes.Count()
+                                </th>
+                                <th>
+                                    Всего: @Model.OrderProductAddressDeliverySizes.Sum(oaps => oaps.DeliveryQuantity)
+                                </th>
+                                <th>
+                                    Всего: @Model.OrderProductAddressDeliverySizes.Sum(oaps => oaps.AcceptanceQuantity)
+                                </th>
+                                <th></th>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr class="active">
+                                <th>Размер</th>
+                                <th>Поставка. Количество</th>
+                                <th>Приемка. Количество</th>
+                            </tr>
+                            <tr class="active">
+                                <td colspan="3">Нет размерных данных</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,497 @@
+﻿@model WebApp.UI.ViewModels.ReportViewModels.OrderProductAddressProductionDateSizesReportViewModel
+@using WebApp.UI.Controllers
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedOrderId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        @if (Model.SelectedOrderId == 0)
+                        {
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Выберите заказ
+                                <span class="caret"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                @Model.Orders[Model.SelectedOrderId]
+                                <span class="caret"></span>
+                            </button>
+                        }
+                        <ul class="dropdown-menu">
+                            @foreach (var order in Model.Orders)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddressProductionDateSizes"
+                                       href="@Url.Action(nameof(OrderProductAddressProductionDateSizesReportController._OrderProductAddressProductionDateSizes), new { orderId = order.Key, sortColumn = Model.SelectedSortColumn })">
+                                        @order.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.OrderProducts.Any())
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SelectedSortColumn, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <div class="btn-group">
+                            @if (Model.SelectedSortColumn == "size")
+                            {
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddressProductionDateSizes" class="btn btn-primary"
+                                   href="@Url.Action(nameof(OrderProductAddressProductionDateSizesReportController._OrderProductAddressProductionDateSizes), new { orderId = Model.SelectedOrderId, sortColumn = "size" })">
+                                    Размер
+                                </a>
+
+                            }
+                            else
+                            {
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddressProductionDateSizes" class="btn btn-default"
+                                   href="@Url.Action(nameof(OrderProductAddressProductionDateSizesReportController._OrderProductAddressProductionDateSizes), new { orderId = Model.SelectedOrderId, sortColumn = "size" })">
+                                    Размер
+                                </a>
+                            }
+
+                            @if (Model.SelectedSortColumn == "quantity")
+                            {
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddressProductionDateSizes" class="btn btn-primary"
+                                   href="@Url.Action(nameof(OrderProductAddressProductionDateSizesReportController._OrderProductAddressProductionDateSizes), new { orderId = Model.SelectedOrderId, sortColumn = "quantity" })">
+                                    Количество. Заказ
+                                </a>
+
+                            }
+                            else
+                            {
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddressProductionDateSizes" class="btn btn-default"
+                                   href="@Url.Action(nameof(OrderProductAddressProductionDateSizesReportController._OrderProductAddressProductionDateSizes), new { orderId = Model.SelectedOrderId, sortColumn = "quantity" })">
+                                    Количество. Заказ
+                                </a>
+                            }
+
+                            @if (Model.SelectedSortColumn == "finishedProductsQuantity")
+                            {
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddressProductionDateSizes" class="btn btn-primary"
+                                   href="@Url.Action(nameof(OrderProductAddressProductionDateSizesReportController._OrderProductAddressProductionDateSizes), new { orderId = Model.SelectedOrderId, sortColumn = "finishedProductsQuantity" })">
+                                    Количество. Готовая продукция
+                                </a>
+
+                            }
+                            else
+                            {
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddressProductionDateSizes" class="btn btn-default"
+                                   href="@Url.Action(nameof(OrderProductAddressProductionDateSizesReportController._OrderProductAddressProductionDateSizes), new { orderId = Model.SelectedOrderId, sortColumn = "finishedProductsQuantity" })">
+                                    Количество. Готовая продукция
+                                </a>
+                            }
+
+                            @if (Model.SelectedSortColumn == "difference")
+                            {
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddressProductionDateSizes" class="btn btn-primary"
+                                   href="@Url.Action(nameof(OrderProductAddressProductionDateSizesReportController._OrderProductAddressProductionDateSizes), new { orderId = Model.SelectedOrderId, sortColumn = "difference" })">
+                                    +/-
+                                </a>
+
+                            }
+                            else
+                            {
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddressProductionDateSizes" class="btn btn-default"
+                                   href="@Url.Action(nameof(OrderProductAddressProductionDateSizesReportController._OrderProductAddressProductionDateSizes), new { orderId = Model.SelectedOrderId, sortColumn = "difference" })">
+                                    +/-
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="form-group">
+                @Html.Label("Продукция", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+
+                    @if (Model.OrderProducts.Any())
+                    {
+                        var orderProductIndex = 0;
+
+                        foreach (var orderProduct in Model.OrderProducts)
+                        {
+                            orderProductIndex++;
+
+                            var orderProductQuantity = orderProduct.OrderProductAddresses
+                                .SelectMany(opa => opa.OrderProductAddressSizes)
+                                .Sum(s => s.Quantity);
+
+                            <table class="table table-condensed table-bordered">
+                                <tr class="active">
+                                    <th>
+                                        @orderProductIndex. @Html.DisplayFor(modelItem => orderProduct.Product.Name)
+                                    </th>
+                                </tr>
+                                <tr class="active">
+                                    <th>
+                                        Количество: @orderProductQuantity
+                                    </th>
+                                </tr>
+                            </table>
+
+                            <div class="form-group">
+                                @Html.Label("Грузополучатели", htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+
+                                    @{
+                                        int orderProductAddressIndex = 0;
+
+                                        if (orderProduct.OrderProductAddresses.Any())
+                                        {
+                                            foreach (var orderProductAddress in orderProduct.OrderProductAddresses)
+                                            {
+                                                orderProductAddressIndex++;
+
+                                                <table class="table table-condensed table-bordered">
+                                                    <tr class="active">
+                                                        <th>
+                                                            @orderProductAddressIndex. @Html.DisplayFor(modelItem => orderProductAddress.Address.Name)
+                                                        </th>
+                                                    </tr>
+                                                    <tr class="active">
+                                                        <th>
+                                                            Дата поставки: @Html.DisplayFor(modelItem => orderProductAddress.DeliveryDate)
+                                                        </th>
+                                                    </tr>
+                                                </table>
+
+                                                <div class="form-group">
+                                                    @Html.Label("Размерные данные готовой продукции", htmlAttributes: new { @class = "control-label col-md-2" })
+                                                    <div class="col-md-10">
+
+                                                        @{
+                                                            var sizes = orderProductAddress.OrderProductAddressSizes
+                                                                .GroupBy(opas => opas.SizeId);
+
+                                                            var productionSizes = orderProductAddress.OrderProductAddressProductionDates
+                                                                .SelectMany(opapd => opapd.OrderProductAddressProductionDateSizes)
+                                                                .GroupBy(opapds => opapds.SizeId);
+
+                                                            var results = sizes.GroupJoin(productionSizes,
+                                                                size => size.Key,
+                                                                productionSize => productionSize.Key,
+                                                                (size, productionSize) => new
+                                                                {
+                                                                    SizeId = size.Key,
+                                                                    Quantity = size.Sum(s => s.Quantity),
+                                                                    FinishedProductsQuantity = productionSize.SingleOrDefault(s => s.Key == size.Key) != null
+                                                                        ? productionSize.Single(s => s.Key == size.Key).Sum(s => s.Quantity)
+                                                                        : 0,
+                                                                    Difference = productionSize.SingleOrDefault(s => s.Key == size.Key) != null
+                                                                        ? productionSize.Single(s => s.Key == size.Key).Sum(s => s.Quantity) - size.Sum(s => s.Quantity)
+                                                                        : 0 - size.Sum(s => s.Quantity)
+                                                                });
+
+                                                            if (Model.SelectedSortColumn == "size")
+                                                            {
+                                                                results = results.OrderBy(r => r.SizeId);
+                                                            }
+
+                                                            if (Model.SelectedSortColumn == "quantity")
+                                                            {
+                                                                results = results.OrderByDescending(r => r.Quantity);
+                                                            }
+
+                                                            if (Model.SelectedSortColumn == "finishedProductsQuantity")
+                                                            {
+                                                                results = results.OrderByDescending(r => r.FinishedProductsQuantity);
+                                                            }
+
+                                                            if (Model.SelectedSortColumn == "difference")
+                                                            {
+                                                                results = results.OrderBy(r => r.Difference);
+                                                            }
+
+                                                            var totalDifference = productionSizes.Sum(size => size.Sum(s => s.Quantity)) - sizes.Sum(size => size.Sum(s => s.Quantity));
+
+                                                            <table class="table table-condensed table-bordered">
+                                                               <tr class="active">
+                                                                   <th rowspan="2">Размер</th>
+                                                                   <th colspan="2">Количество</th>
+                                                                   <th rowspan="2">+/-</th>
+                                                               </tr>
+                                                               <tr class="active">
+                                                                   <th>Заказ</th>
+                                                                   <th>Готовая продукция</th>
+                                                               </tr>
+
+                                                                @if (results.Any())
+                                                                {
+                                                                    foreach (var result in results)
+                                                                    {
+                                                                        <tr>
+                                                                            <td>
+                                                                                @Model.Sizes[result.SizeId]
+                                                                            </td>
+                                                                            <td>
+                                                                                @result.Quantity
+                                                                            </td>
+                                                                            <td>
+                                                                                @result.FinishedProductsQuantity
+                                                                            </td>
+
+                                                                            @if (result.Difference != 0)
+                                                                            {
+                                                                                <td>
+                                                                                    <strong class="text-danger">
+                                                                                        @result.Difference
+                                                                                    </strong>
+                                                                                </td>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <td>
+                                                                                    @result.Difference
+                                                                                </td>
+                                                                            }
+                                                                        </tr>
+                                                                    }
+
+                                                                    <tr class="active">
+                                                                        <th>
+                                                                            Всего: @sizes.Count()
+                                                                        </th>
+                                                                        <th>
+                                                                            @sizes.Sum(size => size.Sum(s => s.Quantity))
+                                                                        </th>
+                                                                        <th>
+                                                                            @productionSizes.Sum(size => size.Sum(s => s.Quantity))
+                                                                        </th>
+
+                                                                        @if (totalDifference != 0)
+                                                                        {
+                                                                            <th>
+                                                                                <strong class="text-danger">
+                                                                                    @totalDifference
+                                                                                </strong>
+                                                                            </th>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <th>
+                                                                                @totalDifference
+                                                                            </th>
+                                                                        }
+                                                                    </tr>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <tr class="active">
+                                                                        <td colspan="4">Нет размерных данных</td>
+                                                                    </tr>
+                                                                }
+
+                                                            </table>
+                                                        }
+
+                                                    </div>
+                                                </div>
+
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <table class="table table-condensed table-bordered">
+                                                <tr class="active">
+                                                    <td>Нет грузополучателей</td>
+                                                </tr>
+                                            </table>
+                                        }
+                                    }
+
+                                    <table class="table table-condensed table-bordered">
+                                        <tr class="active">
+                                            <th>Всего</th>
+                                        </tr>
+                                    </table>
+
+                                    <div class="form-group">
+                                        @Html.Label("Продукция", htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+
+                                            @if (Model.OrderProducts.Any())
+                                            {
+                                                int _orderProductIndex = 0;
+
+                                                foreach (var _orderProduct in Model.OrderProducts)
+                                                {
+                                                    _orderProductIndex++;
+
+                                                    <table class="table table-condensed table-bordered">
+                                                        <tr class="active">
+                                                            <th>
+                                                                @_orderProductIndex. @Html.DisplayFor(modelItem => _orderProduct.Product.Name)
+                                                            </th>
+                                                        </tr>
+                                                    </table>
+
+                                                    <div class="form-group">
+                                                        @Html.Label("Размерные данные готовой продукции", htmlAttributes: new { @class = "control-label col-md-2" })
+                                                        <div class="col-md-10">
+
+                                                            @{
+                                                                var sizes = orderProduct.OrderProductAddresses
+                                                                    .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                    .GroupBy(opas => opas.SizeId);
+
+                                                                var productionSizes = orderProduct.OrderProductAddresses
+                                                                    .SelectMany(opa => opa.OrderProductAddressProductionDates)
+                                                                    .SelectMany(opapd => opapd.OrderProductAddressProductionDateSizes)
+                                                                    .GroupBy(opapds => opapds.SizeId);
+
+                                                                var results = sizes.GroupJoin(productionSizes,
+                                                                    size => size.Key,
+                                                                    productionSize => productionSize.Key,
+                                                                    (size, productionSize) => new
+                                                                    {
+                                                                        SizeId = size.Key,
+                                                                        Quantity = size.Sum(s => s.Quantity),
+                                                                        FinishedProductsQuantity = productionSize.SingleOrDefault(s => s.Key == size.Key) != null
+                                                                            ? productionSize.Single(s => s.Key == size.Key).Sum(s => s.Quantity)
+                                                                            : 0,
+                                                                        Difference = productionSize.SingleOrDefault(s => s.Key == size.Key) != null
+                                                                            ? productionSize.Single(s => s.Key == size.Key).Sum(s => s.Quantity) - size.Sum(s => s.Quantity)
+                                                                            : 0 - size.Sum(s => s.Quantity)
+                                                                    });
+
+                                                                if (Model.SelectedSortColumn == "size")
+                                                                {
+                                                                    results = results.OrderBy(r => r.SizeId);
+                                                                }
+
+                                                                if (Model.SelectedSortColumn == "quantity")
+                                                                {
+                                                                    results = results.OrderByDescending(r => r.Quantity);
+                                                                }
+
+                                                                if (Model.SelectedSortColumn == "finishedProductsQuantity")
+                                                                {
+                                                                    results = results.OrderByDescending(r => r.FinishedProductsQuantity);
+                                                                }
+
+                                                                if (Model.SelectedSortColumn == "difference")
+                                                                {
+                                                                    results = results.OrderBy(r => r.Difference);
+                                                                }
+
+                                                                var totalDifference = productionSizes.Sum(size => size.Sum(s => s.Quantity)) - sizes.Sum(size => size.Sum(s => s.Quantity));
+
+                                                                <table class="table table-condensed table-bordered">
+                                                                    <tr class="active">
+                                                                        <th rowspan="2">Размер</th>
+                                                                        <th colspan="2">Количество</th>
+                                                                        <th rowspan="2">+/-</th>
+                                                                    </tr>
+                                                                    <tr class="active">
+                                                                        <th>Заказ</th>
+                                                                        <th>Готовая продукция</th>
+                                                                    </tr>
+
+                                                                    @if (results.Any())
+                                                                    {
+                                                                        foreach (var result in results)
+                                                                        {
+                                                                            <tr>
+                                                                                <td>
+                                                                                    @Model.Sizes[result.SizeId]
+                                                                                </td>
+                                                                                <td>
+                                                                                    @result.Quantity
+                                                                                </td>
+                                                                                <td>
+                                                                                    @result.FinishedProductsQuantity
+                                                                                </td>
+
+                                                                                @if (result.Difference != 0)
+                                                                                {
+                                                                                    <td>
+                                                                                        <strong class="text-danger">
+                                                                                            @result.Difference
+                                                                                        </strong>
+                                                                                    </td>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <td>
+                                                                                        @result.Difference
+                                                                                    </td>
+                                                                                }
+                                                                            </tr>
+                                                                        }
+
+                                                                        <tr class="active">
+                                                                            <th>
+                                                                                Всего: @sizes.Count()
+                                                                            </th>
+                                                                            <th>
+                                                                                @sizes.Sum(size => size.Sum(s => s.Quantity))
+                                                                            </th>
+                                                                            <th>
+                                                                                @productionSizes.Sum(size => size.Sum(s => s.Quantity))
+                                                                            </th>
+
+                                                                            @if (totalDifference != 0)
+                                                                            {
+                                                                                <th>
+                                                                                    <strong class="text-danger">
+                                                                                        @totalDifference
+                                                                                    </strong>
+                                                                                </th>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <th>
+                                                                                    @totalDifference
+                                                                                </th>
+                                                                            }
+                                                                        </tr>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <tr class="active">
+                                                                            <td colspan="4">Нет размерных данных</td>
+                                                                        </tr>
+                                                                    }
+
+                                                                </table>
+                                                            }
+
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <table class="table table-condensed table-bordered">
+                            <tr class="active">
+                                <td>Нет продукции</td>
+                            </tr>
+                        </table>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

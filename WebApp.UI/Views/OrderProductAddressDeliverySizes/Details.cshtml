@@ -1,0 +1,134 @@
+﻿@model WebApp.UI.ViewModels.OrderProductAddressDeliverySizeViewModels.OrderProductAddressDeliverySizeViewModel
+@using WebApp.UI.Controllers
+
+@{
+    ViewBag.Title = "Размерные данные поставки готовой продукции грузополучателя заказа. Подробная информация";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Размерные данные поставки готовой продукции грузополучателя заказа <small>Подробная информация</small></h4>
+        <hr />
+
+        <ol class="breadcrumb">
+            <li>
+                @Html.ActionLink("Заказы", nameof(OrdersController.Index),
+                    nameof(OrdersController).Replace("Controller", ""))
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Order.Name,
+                    nameof(OrdersController.Details),
+                    nameof(OrdersController).Replace("Controller", ""),
+                    new { id = Model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Order.Id },
+                    null)
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Product.Name,
+                    nameof(OrderProductsController.Details),
+                    nameof(OrderProductsController).Replace("Controller", ""),
+                    new
+                    {
+                        orderId = Model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Order.Id,
+                        productId = Model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Product.Id
+                    },
+                    null)
+            </li>
+            <li>
+                @Html.ActionLink(Model.OrderProductAddressDelivery.OrderProductAddress.Address.Name,
+                    nameof(OrderProductAddressesController.Details),
+                    nameof(OrderProductAddressesController).Replace("Controller", ""),
+                    new
+                    {
+                        orderId = Model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Order.Id,
+                        productId = Model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Product.Id,
+                        addressId = Model.OrderProductAddressDelivery.OrderProductAddress.Address.Id
+                    },
+                    null)
+            </li>
+            <li>
+                @Html.ActionLink($"Поставка готовой продукции {Model.OrderProductAddressDelivery.DeliveryId}",
+                    nameof(OrderProductAddressDeliveriesController.Details),
+                    nameof(OrderProductAddressDeliveriesController).Replace("Controller", ""),
+                    new
+                    {
+                        orderId = Model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Order.Id,
+                        productId = Model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Product.Id,
+                        addressId = Model.OrderProductAddressDelivery.OrderProductAddress.Address.Id,
+                        deliveryId = Model.OrderProductAddressDelivery.DeliveryId
+                    },
+                    null)
+            </li>
+            <li class="active">
+                @Model.Size.Name
+            </li>
+        </ol>
+
+        <p>
+            @Html.ActionLink("Редактировать",
+                nameof(OrderProductAddressDeliverySizesController.Edit),
+                new
+                {
+                    orderId = Model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Order.Id,
+                    productId = Model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Product.Id,
+                    addressId = Model.OrderProductAddressDelivery.OrderProductAddress.Address.Id,
+                    deliveryId = Model.OrderProductAddressDelivery.DeliveryId,
+                    sizeId = Model.Size.Id
+                })
+        </p>
+
+        <hr />
+
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Order, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Order.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Product, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Product.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddressDelivery.OrderProductAddress.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrderProductAddressDelivery.OrderProductAddress.Address.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.OrderProductAddressDelivery.DeliveryId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OrderProductAddressDelivery.DeliveryId, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Size, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Size.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DeliveryQuantity, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.DeliveryQuantity, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AcceptanceQuantity, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.AcceptanceQuantity, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

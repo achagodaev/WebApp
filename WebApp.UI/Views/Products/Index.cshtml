@@ -1,0 +1,76 @@
+﻿@model IEnumerable<WebApp.UI.ViewModels.ProductViewModels.ProductViewModel>
+@using WebApp.UI.Controllers
+
+@{
+    ViewBag.Title = "Продукция";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Продукция</h4>
+        <hr />
+
+        <ol class="breadcrumb">
+            <li class="active">Продукция</li>
+        </ol>
+
+        <p>
+            @Html.ActionLink("Создать", nameof(ProductsController.Create))
+        </p>
+
+        <table class="table table-condensed table-bordered">
+            @if (Model.Any())
+            {
+                <tr class="active">
+                    <th>
+                        @Html.DisplayNameFor(model => model.Id)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th></th>
+                </tr>
+
+                foreach (var product in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => product.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => product.Name)
+                        </td>
+                        <td>
+                            @Html.ActionLink("Подробная информация",
+                                nameof(ProductsController.Details),
+                                new { id = product.Id }) |
+                            @Html.ActionLink("Удалить",
+                                nameof(ProductsController.Delete),
+                                new { id = product.Id })
+                        </td>
+                    </tr>
+                }
+
+                <tr class="active">
+                    <th colspan="3">
+                        Всего: @Model.Count()
+                    </th>
+                </tr>
+            }
+            else
+            {
+                <tr class="active">
+                    <th>
+                        @Html.DisplayNameFor(model => model.Id)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                </tr>
+                <tr class="active">
+                    <td colspan="2">Нет продукции</td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
