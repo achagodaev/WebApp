@@ -21,9 +21,6 @@ namespace WebApp.UI.ViewModels.ReportViewModels
         [Display(Name = "Материал")]
         public int SelectedMaterialId { get; set; }
 
-        [Display(Name = "Сортировка")]
-        public string SelectedSortColumn { get; set; }
-
         public Dictionary<int, string> Orders { get; set; }
 
         public Dictionary<int, string> Products { get; set; }

@@ -10,20 +10,10 @@
                 @Html.LabelFor(model => model.SelectedMaterialId, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     <div class="btn-group">
-                        @if (Model.SelectedMaterialId == 0)
-                        {
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Выберите материал
-                                <span class="caret"></span>
-                            </button>
-                        }
-                        else
-                        {
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                @Model.Materials[Model.SelectedMaterialId]
-                                <span class="caret"></span>
-                            </button>
-                        }
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Materials[Model.SelectedMaterialId]
+                            <span class="caret"></span>
+                        </button>
                         <ul class="dropdown-menu">
                             @foreach (var material in Model.Materials)
                             {
@@ -39,69 +29,353 @@
                 </div>
             </div>
 
-            @if (Model.OrderProductMaterials.Any())
+            @if (Model.SelectedMaterialId == 0)
             {
                 <div class="form-group">
-                    @Html.LabelFor(model => model.SelectedSortColumn, htmlAttributes: new { @class = "control-label col-md-2" })
+                    @Html.Label("Материалы", htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        <div class="btn-group">
-                            @if (Model.SelectedSortColumn == "name")
-                            {
-                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materials" class="btn btn-primary"
-                                   href="@Url.Action(nameof(MaterialsReportController._Materials), new { materialId = Model.SelectedMaterialId, sortColumn = "name" })">
-                                    Наименование
-                                </a>
 
-                            }
-                            else
-                            {
-                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materials" class="btn btn-default"
-                                   href="@Url.Action(nameof(MaterialsReportController._Materials), new { materialId = Model.SelectedMaterialId, sortColumn = "name" })">
-                                    Наименование
-                                </a>
-                            }
+                        @if (Model.OrderProductMaterials.Any())
+                        {
+                            var materials = Model.OrderProductMaterials.GroupBy(opm => opm.MaterialId);
 
-                            @if (Model.SelectedSortColumn == "rate")
+                            if (materials.Any())
                             {
-                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materials" class="btn btn-primary"
-                                   href="@Url.Action(nameof(MaterialsReportController._Materials), new { materialId = Model.SelectedMaterialId, sortColumn = "rate" })">
-                                    Норма расхода
-                                </a>
+                                var materialIndex = 0;
 
+                                foreach (var material in materials)
+                                {
+                                    materialIndex++;
+
+                                    <table class="table table-condensed table-bordered">
+                                        <tr class="active">
+                                            <th>
+                                                @materialIndex. @Model.Materials[material.Key]
+                                            </th>
+                                        </tr>
+                                    </table>
+
+                                    <div class="form-group">
+                                        @Html.Label("Заказы", htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+
+                                            @{
+                                                var orders = material.GroupBy(m => m.OrderId);
+
+                                                if (orders.Any())
+                                                {
+                                                    var orderIndex = 0;
+
+                                                    foreach (var order in orders)
+                                                    {
+                                                        orderIndex++;
+
+                                                        <table class="table table-condensed table-bordered">
+                                                            <tr class="active">
+                                                                <th>
+                                                                    @orderIndex. @Model.Orders[order.Key]
+                                                                </th>
+                                                            </tr>
+                                                        </table>
+
+                                                        <div class="form-group">
+                                                            @Html.Label("Продукция", htmlAttributes: new { @class = "control-label col-md-2" })
+                                                            <div class="col-md-10">
+
+                                                                @{
+                                                                    var products = order.GroupBy(o => o.ProductId);
+
+                                                                    <table class="table table-condensed table-bordered">
+                                                                        <tr class="active">
+                                                                            <th rowspan="2">Наименование</th>
+                                                                            <th colspan="4">Материал</th>
+                                                                        </tr>
+                                                                        <tr class="active">
+                                                                            <th>Норма расхода</th>
+                                                                            <th>Расход</th>
+                                                                            <th>Цена</th>
+                                                                            <th>Сумма</th>
+                                                                        </tr>
+
+                                                                        @if (products.Any())
+                                                                        {
+                                                                            foreach (var product in products)
+                                                                            {
+                                                                                var orderProductMaterial = Model.OrderProductMaterials
+                                                                                    .Single(opm => opm.OrderId == order.Key
+                                                                                    && opm.ProductId == product.Key
+                                                                                    && opm.MaterialId == material.Key);
+
+                                                                                var orderProductQuantity = orderProductMaterial.OrderProduct.OrderProductAddresses
+                                                                                    .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                                    .Sum(opas => opas.Quantity);
+
+                                                                                var orderProductMaterialQuantity = orderProductQuantity * orderProductMaterial.Rate;
+                                                                                var orderProductMaterialPrice = (decimal)(orderProductQuantity * orderProductMaterial.Rate) * orderProductMaterial.Price;
+
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        @Model.Products[product.Key]
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @Html.DisplayFor(modelItem => orderProductMaterial.Rate)
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @orderProductMaterialQuantity
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @Html.DisplayFor(modelItem => orderProductMaterial.Price)
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @orderProductMaterialPrice
+                                                                                    </td>
+                                                                                </tr>
+                                                                            }
+
+                                                                            <tr class="active">
+                                                                                <th>
+                                                                                    Всего: @products.Count()
+                                                                                </th>
+                                                                                <th></th>
+                                                                                <th>
+                                                                                    @products.Sum(p => p.Sum(opm => opm.OrderProduct.OrderProductAddresses
+                                                                                        .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                                        .Sum(opas => opas.Quantity) * opm.Rate))
+                                                                                </th>
+                                                                                <th></th>
+                                                                                <th>
+                                                                                    @products.Sum(p => p.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
+                                                                                        .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                                        .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price))
+                                                                                </th>
+                                                                            </tr>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <tr class="active">
+                                                                                <td colspan="5">Нет продукции</td>
+                                                                            </tr>
+                                                                        }
+
+                                                                    </table>
+                                                                }
+
+                                                            </div>
+                                                        </div>
+                                                    }
+
+                                                    <table class="table table-condensed table-bordered">
+                                                        <tr class="active">
+                                                            <th>Всего</th>
+                                                        </tr>
+                                                    </table>
+
+                                                    <div class="form-group">
+                                                        @Html.Label("Продукция", htmlAttributes: new { @class = "control-label col-md-2" })
+                                                        <div class="col-md-10">
+
+                                                            @{
+                                                                var orderProductMaterials = material.GroupBy(opm => opm.ProductId);
+
+                                                                <table class="table table-condensed table-bordered">
+                                                                    <tr class="active">
+                                                                        <th rowspan="2">Наименование</th>
+                                                                        <th colspan="2">Материал</th>
+                                                                    </tr>
+                                                                    <tr class="active">
+                                                                        <th>Расход</th>
+                                                                        <th>Сумма</th>
+                                                                    </tr>
+
+                                                                    @if (orderProductMaterials.Any())
+                                                                    {
+                                                                        foreach (var orderProductMaterial in orderProductMaterials)
+                                                                        {
+                                                                            <tr>
+                                                                                <td>
+                                                                                    @Model.Products[orderProductMaterial.Key]
+                                                                                </td>
+                                                                                <td>
+                                                                                    @orderProductMaterial.Sum(opm => opm.OrderProduct.OrderProductAddresses
+                                                                                        .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                                        .Sum(opas => opas.Quantity) * opm.Rate)
+                                                                                </td>
+                                                                                <td>
+                                                                                    @orderProductMaterial.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
+                                                                                        .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                                        .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price)
+                                                                                </td>
+                                                                            </tr>
+                                                                        }
+
+                                                                        <tr class="active">
+                                                                            <th>
+                                                                                Всего: @orderProductMaterials.Count()
+                                                                            </th>
+                                                                            <th>
+                                                                                @orderProductMaterials.Sum(p => p.Sum(opm => opm.OrderProduct.OrderProductAddresses
+                                                                                    .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                                    .Sum(opas => opas.Quantity) * opm.Rate))
+                                                                            </th>
+                                                                            <th>
+                                                                                @orderProductMaterials.Sum(p => p.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
+                                                                                    .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                                    .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price))
+                                                                            </th>
+                                                                        </tr>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <tr class="active">
+                                                                            <th>Наименование</th>
+                                                                            <th>Расход</th>
+                                                                            <th>Сумма</th>
+                                                                        </tr>
+                                                                        <tr class="active">
+                                                                            <td colspan="2">Нет материалов</td>
+                                                                        </tr>
+                                                                    }
+
+                                                                </table>
+                                                            }
+
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+
+                                        </div>
+                                    </div>
+                                }
                             }
-                            else
-                            {
-                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materials" class="btn btn-default"
-                                   href="@Url.Action(nameof(MaterialsReportController._Materials), new { materialId = Model.SelectedMaterialId, sortColumn = "rate" })">
-                                    Норма расхода
-                                </a>
-                            }
-                        </div>
+                        }
+                        else
+                        {
+                            <table class="table table-condensed table-bordered">
+                                <tr class="active">
+                                    <td>Нет материалов</td>
+                                </tr>
+                            </table>
+                        }
+
                     </div>
                 </div>
             }
+            else
+            {
+                <div class="form-group">
+                    @Html.Label("Заказы", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
 
-            <div class="form-group">
-                @Html.Label("Заказы", htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-
-                    @if (Model.OrderProductMaterials.Any())
-                    {
-                        var orders = Model.OrderProductMaterials.GroupBy(opm => opm.OrderId);
-
-                        if (orders.Any())
+                        @if (Model.OrderProductMaterials.Any())
                         {
-                            var orderIndex = 0;
+                            var orders = Model.OrderProductMaterials.GroupBy(opm => opm.OrderId);
 
-                            foreach (var order in orders)
+                            if (orders.Any())
                             {
-                                orderIndex++;
+                                var orderIndex = 0;
+
+                                foreach (var order in orders)
+                                {
+                                    orderIndex++;
+
+                                    <table class="table table-condensed table-bordered">
+                                        <tr class="active">
+                                            <th>
+                                                @orderIndex. @Model.Orders[order.Key]
+                                            </th>
+                                        </tr>
+                                    </table>
+
+                                    <div class="form-group">
+                                        @Html.Label("Продукция", htmlAttributes: new { @class = "control-label col-md-2" })
+                                        <div class="col-md-10">
+
+                                            @{
+                                                var products = order.GroupBy(o => o.ProductId);
+
+                                                <table class="table table-condensed table-bordered">
+                                                    <tr class="active">
+                                                        <th rowspan="2">Наименование</th>
+                                                        <th colspan="4">Материал</th>
+                                                    </tr>
+                                                    <tr class="active">
+                                                        <th>Норма расхода</th>
+                                                        <th>Расход</th>
+                                                        <th>Цена</th>
+                                                        <th>Сумма</th>
+                                                    </tr>
+
+                                                    @if (products.Any())
+                                                    {
+                                                        foreach (var product in products)
+                                                        {
+                                                            var orderProductMaterial = Model.OrderProductMaterials
+                                                                .Single(opm => opm.OrderId == order.Key
+                                                                && opm.ProductId == product.Key
+                                                                && opm.MaterialId == Model.SelectedMaterialId);
+
+                                                            var orderProductQuantity = orderProductMaterial.OrderProduct.OrderProductAddresses
+                                                                .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                .Sum(opas => opas.Quantity);
+
+                                                            var orderProductMaterialQuantity = orderProductQuantity * orderProductMaterial.Rate;
+                                                            var orderProductMaterialPrice = (decimal)(orderProductQuantity * orderProductMaterial.Rate) * orderProductMaterial.Price;
+
+                                                            <tr>
+                                                                <td>
+                                                                    @Model.Products[product.Key]
+                                                                </td>
+                                                                <td>
+                                                                    @Html.DisplayFor(modelItem => orderProductMaterial.Rate)
+                                                                </td>
+                                                                <td>
+                                                                    @orderProductMaterialQuantity
+                                                                </td>
+                                                                <td>
+                                                                    @Html.DisplayFor(modelItem => orderProductMaterial.Price)
+                                                                </td>
+                                                                <td>
+                                                                    @orderProductMaterialPrice
+                                                                </td>
+                                                            </tr>
+                                                        }
+
+                                                        <tr class="active">
+                                                            <th>
+                                                                Всего: @products.Count()
+                                                            </th>
+                                                            <th></th>
+                                                            <th>
+                                                                @products.Sum(p => p.Sum(opm => opm.OrderProduct.OrderProductAddresses
+                                                                    .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                    .Sum(opas => opas.Quantity) * opm.Rate))
+                                                            </th>
+                                                            <th></th>
+                                                            <th>
+                                                                @products.Sum(p => p.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
+                                                                    .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                    .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price))
+                                                            </th>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr class="active">
+                                                            <td colspan="5">Нет продукции</td>
+                                                        </tr>
+                                                    }
+
+                                                </table>
+                                            }
+
+                                        </div>
+                                    </div>
+                                }
 
                                 <table class="table table-condensed table-bordered">
                                     <tr class="active">
-                                        <th>
-                                            @orderIndex. @Model.Orders[order.Key]
-                                        </th>
+                                        <th>Всего</th>
                                     </tr>
                                 </table>
 
@@ -110,79 +384,50 @@
                                     <div class="col-md-10">
 
                                         @{
-                                            var products = order.GroupBy(o => o.ProductId);
+                                            var orderProductMaterials = Model.OrderProductMaterials.GroupBy(opm => opm.ProductId);
 
                                             <table class="table table-condensed table-bordered">
                                                 <tr class="active">
-                                                    <th>Наименование</th>
-                                                    <th>Норма расхода</th>
+                                                    <th rowspan="2">Наименование</th>
+                                                    <th colspan="2">Материал</th>
+                                                </tr>
+                                                <tr class="active">
                                                     <th>Расход</th>
-                                                    <th>Цена</th>
                                                     <th>Сумма</th>
                                                 </tr>
 
-                                                @if (products.Any())
+                                                @if (orderProductMaterials.Any())
                                                 {
-                                                    if (Model.SelectedSortColumn == "name")
+                                                    foreach (var orderProductMaterial in orderProductMaterials)
                                                     {
-                                                        products = products.OrderBy(p => Model.Products[p.Key]);
-                                                    }
-                                                    
-                                                    if (Model.SelectedSortColumn == "rate")
-                                                    {
-                                                        products = products.OrderByDescending(p => Model.OrderProductMaterials
-                                                            .Single(opm => opm.OrderId == order.Key
-                                                            && opm.ProductId == p.Key
-                                                            && opm.MaterialId == Model.SelectedMaterialId)
-                                                            .Rate);
-                                                    }
-
-                                                    foreach (var product in products)
-                                                    {
-                                                        var orderProductMaterial = Model.OrderProductMaterials
-                                                            .Single(opm => opm.OrderId == order.Key
-                                                            && opm.ProductId == product.Key
-                                                            && opm.MaterialId == Model.SelectedMaterialId);
-
-                                                        var orderProductQuantity = orderProductMaterial.OrderProduct.OrderProductAddresses
-                                                            .SelectMany(opa => opa.OrderProductAddressSizes)
-                                                            .Sum(opas => opas.Quantity);
-
-                                                        var orderProductMaterialQuantity = orderProductQuantity * orderProductMaterial.Rate;
-                                                        var orderProductMaterialPrice = (decimal)(orderProductQuantity * orderProductMaterial.Rate) * orderProductMaterial.Price;
-
                                                         <tr>
                                                             <td>
-                                                                @Model.Products[product.Key]
+                                                                @Model.Products[orderProductMaterial.Key]
                                                             </td>
                                                             <td>
-                                                                @Html.DisplayFor(modelItem => orderProductMaterial.Rate)
+                                                                @orderProductMaterial.Sum(opm => opm.OrderProduct.OrderProductAddresses
+                                                                    .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                    .Sum(opas => opas.Quantity) * opm.Rate)
                                                             </td>
                                                             <td>
-                                                                @orderProductMaterialQuantity
-                                                            </td>
-                                                            <td>
-                                                                @Html.DisplayFor(modelItem => orderProductMaterial.Price)
-                                                            </td>
-                                                            <td>
-                                                                @orderProductMaterialPrice
+                                                                @orderProductMaterial.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
+                                                                    .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                                    .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price)
                                                             </td>
                                                         </tr>
                                                     }
 
                                                     <tr class="active">
                                                         <th>
-                                                            Всего: @products.Count()
+                                                            Всего: @orderProductMaterials.Count()
                                                         </th>
-                                                        <th></th>
                                                         <th>
-                                                            @products.Sum(p => p.Sum(opm => opm.OrderProduct.OrderProductAddresses
+                                                            @orderProductMaterials.Sum(p => p.Sum(opm => opm.OrderProduct.OrderProductAddresses
                                                                 .SelectMany(opa => opa.OrderProductAddressSizes)
                                                                 .Sum(opas => opas.Quantity) * opm.Rate))
                                                         </th>
-                                                        <th></th>
                                                         <th>
-                                                            @products.Sum(p => p.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
+                                                            @orderProductMaterials.Sum(p => p.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
                                                                 .SelectMany(opa => opa.OrderProductAddressSizes)
                                                                 .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price))
                                                         </th>
@@ -191,7 +436,12 @@
                                                 else
                                                 {
                                                     <tr class="active">
-                                                        <td colspan="5">Нет продукции</td>
+                                                        <th>Наименование</th>
+                                                        <th>Расход</th>
+                                                        <th>Сумма</th>
+                                                    </tr>
+                                                    <tr class="active">
+                                                        <td colspan="2">Нет материалов</td>
                                                     </tr>
                                                 }
 
@@ -202,18 +452,18 @@
                                 </div>
                             }
                         }
-                    }
-                    else
-                    {
-                        <table class="table table-condensed table-bordered">
-                            <tr class="active">
-                                <td>Нет заказов</td>
-                            </tr>
-                        </table>
-                    }
+                        else
+                        {
+                            <table class="table table-condensed table-bordered">
+                                <tr class="active">
+                                    <td>Нет заказов</td>
+                                </tr>
+                            </table>
+                        }
 
+                    </div>
                 </div>
-            </div>
+            }
 
         </div>
     </div>

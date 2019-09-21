@@ -21,12 +21,11 @@ namespace WebApp.UI.Controllers
             return View();
         }
 
-        public ActionResult _Materials(int materialId = 0, string sortColumn = "name")
+        public ActionResult _Materials(int materialId = 0)
         {
             MaterialsReportViewModel model = new MaterialsReportViewModel();
 
             model.SelectedMaterialId = materialId;
-            model.SelectedSortColumn = sortColumn;
 
             IQueryable<OrderProductMaterial> orderProductMaterials = context.OrderProductMaterials
                 .Include(opm => opm.OrderProduct.Order)
@@ -39,13 +38,13 @@ namespace WebApp.UI.Controllers
             if (materialId != 0)
             {
                 orderProductMaterials = orderProductMaterials.Where(opm => opm.MaterialId == materialId);
+            }
 
-                if (orderProductMaterials.Any())
+            if (orderProductMaterials.Any())
+            {
+                foreach (var orderProductMaterial in orderProductMaterials)
                 {
-                    foreach (var orderProductMaterial in orderProductMaterials)
-                    {
-                        model.OrderProductMaterials.Add(orderProductMaterial);
-                    }
+                    model.OrderProductMaterials.Add(orderProductMaterial);
                 }
             }
 
@@ -64,6 +63,8 @@ namespace WebApp.UI.Controllers
                     model.Products.Add(product.Id, product.Name);
                 }
             }
+
+            model.Materials.Add(0, "Все");
 
             if (context.Materials.Any())
             {

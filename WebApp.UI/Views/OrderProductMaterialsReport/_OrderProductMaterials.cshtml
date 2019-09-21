@@ -193,75 +193,84 @@
                             </tr>
                         </table>
 
-                        var materials = Model.OrderProducts
-                            .SelectMany(op => op.OrderProductMaterials)
-                            .GroupBy(opm => opm.MaterialId);
+                        <div class="form-group">
+                            @Html.Label("Материалы", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
 
-                        if (Model.SelectedSortColumn == "name")
-                        {
-                            materials = materials.OrderBy(m => Model.Materials[m.Key]);
-                        }
+                                @{
+                                    var materials = Model.OrderProducts
+                                        .SelectMany(op => op.OrderProductMaterials)
+                                        .GroupBy(opm => opm.MaterialId);
 
-                        if (Model.SelectedSortColumn == "sum")
-                        {
-                            materials = materials.OrderByDescending(m => m.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
-                                .SelectMany(opa => opa.OrderProductAddressSizes)
-                                .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price));
-                        }
+                                    if (Model.SelectedSortColumn == "name")
+                                    {
+                                        materials = materials.OrderBy(m => Model.Materials[m.Key]);
+                                    }
 
-                        <table class="table table-condensed table-bordered">
-                            <tr class="active">
-                                <th>Наименование</th>
-                                <th>Расход</th>
-                                <th>Сумма</th>
-                            </tr>
+                                    if (Model.SelectedSortColumn == "sum")
+                                    {
+                                        materials = materials.OrderByDescending(m => m.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
+                                            .SelectMany(opa => opa.OrderProductAddressSizes)
+                                            .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price));
+                                    }
 
-                            @if (materials.Any())
-                            {
-                                foreach (var material in materials)
-                                {
-                                    <tr>
-                                        <td>
-                                            @Model.Materials[material.Key]
-                                        </td>
-                                        <td>
-                                            @material.Sum(opm => opm.OrderProduct.OrderProductAddresses
-                                                .SelectMany(opa => opa.OrderProductAddressSizes)
-                                                .Sum(opas => opas.Quantity) * opm.Rate)
-                                        </td>
-                                        <td>
-                                            @material.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
-                                                .SelectMany(opa => opa.OrderProductAddressSizes)
-                                                .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price)
-                                        </td>
-                                    </tr>
+                                    <table class="table table-condensed table-bordered">
+                                        <tr class="active">
+                                            <th>Наименование</th>
+                                            <th>Расход</th>
+                                            <th>Сумма</th>
+                                        </tr>
+
+                                        @if (materials.Any())
+                                        {
+                                            foreach (var material in materials)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Model.Materials[material.Key]
+                                                    </td>
+                                                    <td>
+                                                        @material.Sum(opm => opm.OrderProduct.OrderProductAddresses
+                                                            .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                            .Sum(opas => opas.Quantity) * opm.Rate)
+                                                    </td>
+                                                    <td>
+                                                        @material.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
+                                                            .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                            .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price)
+                                                    </td>
+                                                </tr>
+                                            }
+
+                                            <tr class="active">
+                                                <th>
+                                                    Всего: @materials.Count()
+                                                </th>
+                                                <th></th>
+                                                <th>
+                                                    @materials.Sum(m => m.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
+                                                        .SelectMany(opa => opa.OrderProductAddressSizes)
+                                                        .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price))
+                                                </th>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr class="active">
+                                                <th>Наименование</th>
+                                                <th>Расход</th>
+                                                <th>Сумма</th>
+                                            </tr>
+                                            <tr class="active">
+                                                <td colspan="2">Нет материалов</td>
+                                            </tr>
+                                        }
+
+                                    </table>
                                 }
 
-                                <tr class="active">
-                                    <th>
-                                        Всего: @materials.Count()
-                                    </th>
-                                    <th></th>
-                                    <th>
-                                        @materials.Sum(m => m.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
-                                            .SelectMany(opa => opa.OrderProductAddressSizes)
-                                            .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price))
-                                    </th>
-                                </tr>
-                            }
-                            else
-                            {
-                                <tr class="active">
-                                    <th>Наименование</th>
-                                    <th>Расход</th>
-                                    <th>Сумма</th>
-                                </tr>
-                                <tr class="active">
-                                    <td colspan="2">Нет материалов</td>
-                                </tr>
-                            }
-
-                        </table>
+                            </div>
+                        </div>
                     }
                     else
                     {
