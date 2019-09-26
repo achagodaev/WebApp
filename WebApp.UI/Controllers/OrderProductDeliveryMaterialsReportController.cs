@@ -32,10 +32,10 @@ namespace WebApp.UI.Controllers
                 .Include(op => op.Order)
                 .Include(op => op.Product)
                 .Include(op => op.OrderProductAddresses)
-                .Include(op => op.OrderProductMaterials)
-                .Include(op => op.OrderProductDeliveries)
                 .Include(op => op.OrderProductAddresses.Select(opa => opa.OrderProductAddressSizes))
-                .Include(op => op.OrderProductMaterials.Select(opm => opm.OrderProductDeliveryMaterials));
+                .Include(op => op.OrderProductMaterials)
+                .Include(op => op.OrderProductMaterials.Select(opm => opm.OrderProductDeliveryMaterials))
+                .Include(op => op.OrderProductDeliveries);
 
             if (orderId != 0)
             {

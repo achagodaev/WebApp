@@ -12,7 +12,7 @@ using WebApp.UI.Repositories;
 
 namespace WebApp.UI.Controllers
 {
-    public class MaterialsReportController : Controller
+    public class MaterialDeliveriesReportController : Controller
     {
         private WebAppDbContext context = new WebAppDbContext();
 
@@ -21,42 +21,48 @@ namespace WebApp.UI.Controllers
             return View();
         }
 
-        public ActionResult _Materials(int productId = 0, int supplierId = 0, int materialId = 0)
+        public ActionResult _MaterialDeliveries(int productId = 0, int supplierId = 0, int materialId = 0)
         {
-            MaterialsReportViewModel model = new MaterialsReportViewModel();
+            MaterialDeliveriesReportViewModel model = new MaterialDeliveriesReportViewModel();
 
             model.SelectedProductId = productId;
             model.SelectedSupplierId = supplierId;
             model.SelectedMaterialId = materialId;
 
-            IQueryable<OrderProductMaterial> orderProductMaterials = context.OrderProductMaterials
-                .Include(opm => opm.Material)
-                .Include(opm => opm.Supplier)
-                .Include(opm => opm.OrderProduct.Order)
-                .Include(opm => opm.OrderProduct.Product)
-                .Include(opm => opm.OrderProduct.OrderProductAddresses)
-                .Include(opm => opm.OrderProduct.OrderProductAddresses.Select(opa => opa.OrderProductAddressSizes));
+            IQueryable<OrderProductDeliveryMaterial> orderProductDeliveryMaterials = context.OrderProductDeliveryMaterials
+                .Include(opdm => opdm.Material)
+                .Include(opdm => opdm.OrderProductDelivery.OrderProduct.Order)
+                .Include(opdm => opdm.OrderProductDelivery.OrderProduct.Product)
+                .Include(opdm => opdm.OrderProductDelivery.OrderProduct.Order)
+                .Include(opdm => opdm.OrderProductDelivery.OrderProduct.Product)
+                .Include(opdm => opdm.OrderProductDelivery.OrderProduct.OrderProductAddresses)
+                .Include(opdm => opdm.OrderProductDelivery.OrderProduct.OrderProductAddresses.Select(opa => opa.OrderProductAddressSizes))
+                .Include(opdm => opdm.OrderProductDelivery.OrderProduct.OrderProductMaterials)
+                .Include(opdm => opdm.OrderProductDelivery.OrderProduct.OrderProductMaterials.Select(opm => opm.OrderProductDeliveryMaterials))
+                .Include(opdm => opdm.OrderProductDelivery.OrderProduct.OrderProductDeliveries)
+                .Include(opdm => opdm.OrderProductMaterial.Material)
+                .Include(opdm => opdm.OrderProductMaterial.Supplier);
 
             if (productId != 0)
             {
-                orderProductMaterials = orderProductMaterials.Where(opm => opm.ProductId == productId);
+                orderProductDeliveryMaterials = orderProductDeliveryMaterials.Where(opdm => opdm.ProductId == productId);
             }
 
             if (supplierId != 0)
             {
-                orderProductMaterials = orderProductMaterials.Where(opm => opm.SupplierId == supplierId);
+                orderProductDeliveryMaterials = orderProductDeliveryMaterials.Where(opdm => opdm.OrderProductMaterial.SupplierId == supplierId);
             }
 
             if (materialId != 0)
             {
-                orderProductMaterials = orderProductMaterials.Where(opm => opm.MaterialId == materialId);
+                orderProductDeliveryMaterials = orderProductDeliveryMaterials.Where(opdm => opdm.MaterialId == materialId);
             }
 
-            if (orderProductMaterials.Any())
+            if (orderProductDeliveryMaterials.Any())
             {
-                foreach (var orderProductMaterial in orderProductMaterials)
+                foreach (var orderProductDeliveryMaterial in orderProductDeliveryMaterials)
                 {
-                    model.OrderProductMaterials.Add(orderProductMaterial);
+                    model.OrderProductDeliveryMaterials.Add(orderProductDeliveryMaterial);
                 }
             }
 

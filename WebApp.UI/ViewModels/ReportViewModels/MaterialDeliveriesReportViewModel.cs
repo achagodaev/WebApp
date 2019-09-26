@@ -7,16 +7,16 @@ using WebApp.UI.Models;
 
 namespace WebApp.UI.ViewModels.ReportViewModels
 {
-    public class MaterialsReportViewModel
+    public class MaterialDeliveriesReportViewModel
     {
-        public MaterialsReportViewModel()
+        public MaterialDeliveriesReportViewModel()
         {
             Orders = new Dictionary<int, string>();
             Products = new Dictionary<int, string>();
             Suppliers = new Dictionary<int, string>();
             Materials = new Dictionary<int, string>();
 
-            OrderProductMaterials = new List<OrderProductMaterial>();
+            OrderProductDeliveryMaterials = new List<OrderProductDeliveryMaterial>();
         }
 
         [Display(Name = "Продукция")]
@@ -36,6 +36,6 @@ namespace WebApp.UI.ViewModels.ReportViewModels
 
         public Dictionary<int, string> Materials { get; set; }
 
-        public List<OrderProductMaterial> OrderProductMaterials { get; set; }
+        public List<OrderProductDeliveryMaterial> OrderProductDeliveryMaterials { get; set; }
     }
 }

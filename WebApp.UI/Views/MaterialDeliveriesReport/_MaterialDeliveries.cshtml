@@ -1,0 +1,120 @@
+﻿@model WebApp.UI.ViewModels.ReportViewModels.MaterialDeliveriesReportViewModel
+@using WebApp.UI.Models
+@using WebApp.UI.Controllers
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedProductId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Products[Model.SelectedProductId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var product in Model.Products)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materialDeliveries"
+                                       href="@Url.Action(nameof(MaterialDeliveriesReportController._MaterialDeliveries), new { productId = product.Key, supplierId = Model.SelectedSupplierId, materialId = Model.SelectedMaterialId })">
+                                        @product.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedSupplierId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Suppliers[Model.SelectedSupplierId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var supplier in Model.Suppliers)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materialDeliveries"
+                                       href="@Url.Action(nameof(MaterialDeliveriesReportController._MaterialDeliveries), new { productId = Model.SelectedProductId, supplierId = supplier.Key, materialId = Model.SelectedMaterialId })">
+                                        @supplier.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedMaterialId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Materials[Model.SelectedMaterialId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var material in Model.Materials)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materialDeliveries"
+                                       href="@Url.Action(nameof(MaterialDeliveriesReportController._MaterialDeliveries), new { productId = Model.SelectedProductId, supplierId = Model.SelectedSupplierId, materialId = material.Key })">
+                                        @material.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Поставки", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+
+                    @if (Model.OrderProductDeliveryMaterials.Any())
+                    {
+                        var orders = Model.OrderProductDeliveryMaterials.GroupBy(opdm => opdm.OrderId);
+
+                        if (orders.Any())
+                        {
+                            var orderIndex = 0;
+
+                            foreach (var order in orders)
+                            {
+                                orderIndex++;
+
+                                <table class="table table-condensed table-bordered">
+                                    <tr class="active">
+                                        <th>
+                                            @orderIndex. @Model.Orders[order.Key]
+                                        </th>
+                                    </tr>
+                                </table>
+
+
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <table class="table table-condensed table-bordered">
+                            <tr class="active">
+                                <td>Нет поставок</td>
+                            </tr>
+                        </table>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

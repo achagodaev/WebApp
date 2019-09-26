@@ -7,6 +7,52 @@
         <div class="form-horizontal">
 
             <div class="form-group">
+                @Html.LabelFor(model => model.SelectedProductId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Products[Model.SelectedProductId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var product in Model.Products)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materials"
+                                       href="@Url.Action(nameof(MaterialsReportController._Materials), new { productId = product.Key, supplierId = Model.SelectedSupplierId, materialId = Model.SelectedMaterialId })">
+                                        @product.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedSupplierId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Suppliers[Model.SelectedSupplierId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var supplier in Model.Suppliers)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materials"
+                                       href="@Url.Action(nameof(MaterialsReportController._Materials), new { productId = Model.SelectedProductId, supplierId = supplier.Key, materialId = Model.SelectedMaterialId })">
+                                        @supplier.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
                 @Html.LabelFor(model => model.SelectedMaterialId, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     <div class="btn-group">
@@ -19,7 +65,7 @@
                             {
                                 <li>
                                     <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materials"
-                                       href="@Url.Action(nameof(MaterialsReportController._Materials), new { materialId = material.Key })">
+                                       href="@Url.Action(nameof(MaterialsReportController._Materials), new { productId = Model.SelectedProductId, supplierId = Model.SelectedSupplierId, materialId = material.Key })">
                                         @material.Value
                                     </a>
                                 </li>
@@ -88,11 +134,12 @@
                                                                     <table class="table table-condensed table-bordered">
                                                                         <tr class="active">
                                                                             <th rowspan="2">Наименование</th>
-                                                                            <th colspan="4">Материал</th>
+                                                                            <th colspan="5">Материал</th>
                                                                         </tr>
                                                                         <tr class="active">
                                                                             <th>Норма расхода</th>
                                                                             <th>Расход</th>
+                                                                            <th>Поставщик</th>
                                                                             <th>Цена</th>
                                                                             <th>Сумма</th>
                                                                         </tr>
@@ -124,6 +171,9 @@
                                                                                         @orderProductMaterialQuantity
                                                                                     </td>
                                                                                     <td>
+                                                                                        @Html.DisplayFor(modelItem => orderProductMaterial.Supplier.Name)
+                                                                                    </td>
+                                                                                    <td>
                                                                                         @Html.DisplayFor(modelItem => orderProductMaterial.Price)
                                                                                     </td>
                                                                                     <td>
@@ -142,7 +192,7 @@
                                                                                         .SelectMany(opa => opa.OrderProductAddressSizes)
                                                                                         .Sum(opas => opas.Quantity) * opm.Rate))
                                                                                 </th>
-                                                                                <th></th>
+                                                                                <th colspan="2"></th>
                                                                                 <th>
                                                                                     @products.Sum(p => p.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
                                                                                         .SelectMany(opa => opa.OrderProductAddressSizes)
@@ -153,7 +203,7 @@
                                                                         else
                                                                         {
                                                                             <tr class="active">
-                                                                                <td colspan="5">Нет продукции</td>
+                                                                                <td colspan="6">Нет продукции</td>
                                                                             </tr>
                                                                         }
 
@@ -297,11 +347,12 @@
                                                 <table class="table table-condensed table-bordered">
                                                     <tr class="active">
                                                         <th rowspan="2">Наименование</th>
-                                                        <th colspan="4">Материал</th>
+                                                        <th colspan="5">Материал</th>
                                                     </tr>
                                                     <tr class="active">
                                                         <th>Норма расхода</th>
                                                         <th>Расход</th>
+                                                        <th>Поставщик</th>
                                                         <th>Цена</th>
                                                         <th>Сумма</th>
                                                     </tr>
@@ -333,6 +384,9 @@
                                                                     @orderProductMaterialQuantity
                                                                 </td>
                                                                 <td>
+                                                                    @Html.DisplayFor(modelItem => orderProductMaterial.Supplier.Name)
+                                                                </td>
+                                                                <td>
                                                                     @Html.DisplayFor(modelItem => orderProductMaterial.Price)
                                                                 </td>
                                                                 <td>
@@ -351,7 +405,7 @@
                                                                     .SelectMany(opa => opa.OrderProductAddressSizes)
                                                                     .Sum(opas => opas.Quantity) * opm.Rate))
                                                             </th>
-                                                            <th></th>
+                                                            <th colspan="2"></th>
                                                             <th>
                                                                 @products.Sum(p => p.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
                                                                     .SelectMany(opa => opa.OrderProductAddressSizes)
@@ -362,7 +416,7 @@
                                                     else
                                                     {
                                                         <tr class="active">
-                                                            <td colspan="5">Нет продукции</td>
+                                                            <td colspan="6">Нет продукции</td>
                                                         </tr>
                                                     }
 
