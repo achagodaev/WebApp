@@ -139,6 +139,11 @@
                                                         </tr>
                                                         <tr class="active">
                                                             <th>
+                                                                Поставщик: @Html.DisplayFor(modelItem => orderProductMaterial.Supplier.Name)
+                                                            </th>
+                                                        </tr>
+                                                        <tr class="active">
+                                                            <th>
                                                                 Дата поставки: @Html.DisplayFor(modelItem => orderProductMaterial.DeliveryDate)
                                                             </th>
                                                         </tr>
@@ -414,6 +419,7 @@
                                                                 {
                                                                     <tr class="active">
                                                                         <th rowspan="2">Наименование</th>
+                                                                        <th rowspan="2">Поставщик</th>
                                                                         <th colspan="2">Количество</th>
                                                                         <th rowspan="2">+/-</th>
                                                                     </tr>
@@ -440,9 +446,12 @@
                                                                                 @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.Material.Name)
                                                                             </td>
                                                                             <td>
-                                                                                @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.DeliveryQuantity)
+                                                                                @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.OrderProductMaterial.Supplier.Name)
                                                                             </td>
                                                                             <td>
+                                                                                @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.DeliveryQuantity)
+                                                                            </td>
+                                                                            <td>.
                                                                                 @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.AcceptanceQuantity)
                                                                             </td>
 
@@ -464,7 +473,7 @@
                                                                     }
 
                                                                     <tr class="active">
-                                                                        <th colspan="4">
+                                                                        <th colspan="5">
                                                                             Всего: @orderProductDelivery.OrderProductDeliveryMaterials.Count()
                                                                         </th>
                                                                     </tr>
@@ -473,6 +482,7 @@
                                                                 {
                                                                     <tr class="active">
                                                                         <th rowspan="2">Наименование</th>
+                                                                        <th rowspan="2">Поставщик</th>
                                                                         <th colspan="2">Количество</th>
                                                                         <th rowspan="2">+/-</th>
                                                                     </tr>
@@ -481,7 +491,7 @@
                                                                         <th>Приемка</th>
                                                                     </tr>
                                                                     <tr class="active">
-                                                                        <td colspan="4">Нет материалов</td>
+                                                                        <td colspan="5">Нет материалов</td>
                                                                     </tr>
                                                                 }
                                                             </table>

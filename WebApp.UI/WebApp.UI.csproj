@@ -128,6 +128,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\ProductDeliveriesReportController.cs" />
     <Compile Include="Controllers\MaterialDeliveriesReportController.cs" />
     <Compile Include="Controllers\MaterialsReportController.cs" />
     <Compile Include="Controllers\OrderProductMaterialsReportController.cs" />
@@ -272,6 +273,7 @@
     <Compile Include="ViewModels\ReportViewModels\OrderProductAddressProductionDateSizesReportViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModels\OrderProductAddressSizesReportViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModels\OrderProductMaterialsReportViewModel.cs" />
+    <Compile Include="ViewModels\ReportViewModels\ProductDeliveriesReportViewModel.cs" />
     <Compile Include="ViewModels\SizeViewModels\CreateSizeViewModel.cs" />
     <Compile Include="ViewModels\SizeViewModels\EditSizeViewModel.cs" />
     <Compile Include="ViewModels\SizeViewModels\SizeDetailsViewModel.cs" />
@@ -413,6 +415,8 @@
     <Content Include="Views\MaterialsReport\_Materials.cshtml" />
     <Content Include="Views\MaterialDeliveriesReport\Index.cshtml" />
     <Content Include="Views\MaterialDeliveriesReport\_MaterialDeliveries.cshtml" />
+    <Content Include="Views\ProductDeliveriesReport\Index.cshtml" />
+    <Content Include="Views\ProductDeliveriesReport\_ProductDeliveries.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

@@ -34,6 +34,7 @@ namespace WebApp.UI.Controllers
                 .Include(op => op.OrderProductAddresses)
                 .Include(op => op.OrderProductAddresses.Select(opa => opa.OrderProductAddressSizes))
                 .Include(op => op.OrderProductMaterials)
+                .Include(op => op.OrderProductMaterials.Select(opm => opm.Supplier))
                 .Include(op => op.OrderProductMaterials.Select(opm => opm.OrderProductDeliveryMaterials))
                 .Include(op => op.OrderProductDeliveries);
 

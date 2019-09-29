@@ -1,0 +1,19 @@
+﻿@using WebApp.UI.Controllers
+
+@{
+    ViewBag.Title = "Отчет. Поставки готовой продукции";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Отчет <small>Поставки готовой продукции</small></h4>
+        <hr />
+    </div>
+</div>
+
+<div class="row">
+    <div id="productDeliveries" class="col-md-12">
+        @Html.Action(nameof(ProductDeliveriesReportController._ProductDeliveries))
+    </div>
+</div>
+

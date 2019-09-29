@@ -7,17 +7,16 @@ using WebApp.UI.Models;
 
 namespace WebApp.UI.ViewModels.ReportViewModels
 {
-    public class MaterialDeliveriesReportViewModel
+    public class ProductDeliveriesReportViewModel
     {
-        public MaterialDeliveriesReportViewModel()
+        public ProductDeliveriesReportViewModel()
         {
             Orders = new Dictionary<int, string>();
             Products = new Dictionary<int, string>();
-            Suppliers = new Dictionary<int, string>();
-            Materials = new Dictionary<int, string>();
+            Addresses = new Dictionary<int, string>();
             Deliveries = new Dictionary<int, string>();
 
-            OrderProductDeliveryMaterials = new List<OrderProductDeliveryMaterial>();
+            OrderProductAddressDeliverySizes = new List<OrderProductAddressDeliverySize>();
         }
 
         [Display(Name = "Заказ")]
@@ -26,22 +25,17 @@ namespace WebApp.UI.ViewModels.ReportViewModels
         [Display(Name = "Продукция")]
         public int SelectedProductId { get; set; }
 
-        [Display(Name = "Поставщик")]
-        public int SelectedSupplierId { get; set; }
-
-        [Display(Name = "Материал")]
-        public int SelectedMaterialId { get; set; }
+        [Display(Name = "Грузополучатель")]
+        public int SelectedAddressId { get; set; }
 
         public Dictionary<int, string> Orders { get; set; }
 
         public Dictionary<int, string> Products { get; set; }
 
-        public Dictionary<int, string> Suppliers { get; set; }
-
-        public Dictionary<int, string> Materials { get; set; }
+        public Dictionary<int, string> Addresses { get; set; }
 
         public Dictionary<int, string> Deliveries { get; set; }
 
-        public List<OrderProductDeliveryMaterial> OrderProductDeliveryMaterials { get; set; }
+        public List<OrderProductAddressDeliverySize> OrderProductAddressDeliverySizes { get; set; }
     }
 }

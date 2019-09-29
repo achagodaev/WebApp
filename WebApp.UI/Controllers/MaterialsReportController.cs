@@ -21,10 +21,11 @@ namespace WebApp.UI.Controllers
             return View();
         }
 
-        public ActionResult _Materials(int productId = 0, int supplierId = 0, int materialId = 0)
+        public ActionResult _Materials(int orderId = 0, int productId = 0, int supplierId = 0, int materialId = 0)
         {
             MaterialsReportViewModel model = new MaterialsReportViewModel();
 
+            model.SelectedOrderId = orderId;
             model.SelectedProductId = productId;
             model.SelectedSupplierId = supplierId;
             model.SelectedMaterialId = materialId;
@@ -36,6 +37,11 @@ namespace WebApp.UI.Controllers
                 .Include(opm => opm.OrderProduct.Product)
                 .Include(opm => opm.OrderProduct.OrderProductAddresses)
                 .Include(opm => opm.OrderProduct.OrderProductAddresses.Select(opa => opa.OrderProductAddressSizes));
+
+            if (orderId != 0)
+            {
+                orderProductMaterials = orderProductMaterials.Where(opm => opm.OrderId == orderId);
+            }
 
             if (productId != 0)
             {
@@ -59,6 +65,8 @@ namespace WebApp.UI.Controllers
                     model.OrderProductMaterials.Add(orderProductMaterial);
                 }
             }
+
+            model.Orders.Add(0, "Все");
 
             if (context.Orders.Any())
             {

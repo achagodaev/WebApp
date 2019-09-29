@@ -1,0 +1,218 @@
+﻿@model WebApp.UI.ViewModels.ReportViewModels.ProductDeliveriesReportViewModel
+@using WebApp.UI.Controllers
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedOrderId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Orders[Model.SelectedOrderId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var order in Model.Orders)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#productDeliveries"
+                                       href="@Url.Action(nameof(ProductDeliveriesReportController._ProductDeliveries), new { orderId = order.Key, productId = Model.SelectedProductId, addressId = Model.SelectedAddressId })">
+                                        @order.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedProductId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Products[Model.SelectedProductId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var product in Model.Products)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#productDeliveries"
+                                       href="@Url.Action(nameof(ProductDeliveriesReportController._ProductDeliveries), new { orderId = Model.SelectedOrderId, productId = product.Key, addressId = Model.SelectedAddressId })">
+                                        @product.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedAddressId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Addresses[Model.SelectedAddressId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var address in Model.Addresses)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#productDeliveries"
+                                       href="@Url.Action(nameof(ProductDeliveriesReportController._ProductDeliveries), new { orderId = Model.SelectedOrderId, productId = Model.SelectedProductId, addressId = address.Key })">
+                                        @address.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Поставки", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+
+                    @if (Model.OrderProductAddressDeliverySizes.Any())
+                    {
+                        var deliveries = Model.OrderProductAddressDeliverySizes.GroupBy(opdm => new { opdm.OrderId, opdm.ProductId, opdm.AddressId, opdm.DeliveryId });
+
+                        if (deliveries.Any())
+                        {
+                            var deliveryIndex = 0;
+
+                            foreach (var delivery in deliveries)
+                            {
+                                deliveryIndex++;
+
+                                <table class="table table-condensed table-bordered">
+                                    <tr class="active">
+                                        <th>
+                                            @deliveryIndex. @Model.Deliveries[int.Parse($"{delivery.Key.OrderId}{delivery.Key.ProductId}{delivery.Key.AddressId}{delivery.Key.DeliveryId}")]
+                                        </th>
+                                    </tr>
+                                    <tr class="active">
+                                        <th>
+                                            Заказ: @Model.Orders[delivery.Key.OrderId]
+                                        </th>
+                                    </tr>
+                                    <tr class="active">
+                                        <th>
+                                            Продукция: @Model.Products[delivery.Key.ProductId]
+                                        </th>
+                                    </tr>
+                                    <tr class="active">
+                                        <th>
+                                            Грузополучатель: @Model.Addresses[delivery.Key.AddressId]
+                                        </th>
+                                    </tr>
+                                </table>
+
+                                <div class="form-group">
+                                    @Html.Label("Размерные данные", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        <table class="table table-condensed table-bordered">
+                                            <tr class="active">
+                                                <th rowspan="2">Размер</th>
+                                                <th colspan="2">Количество</th>
+                                                <th rowspan="2">+/-</th>
+                                            </tr>
+                                            <tr class="active">
+                                                <th>Поставка</th>
+                                                <th>Приемка</th>
+                                            </tr>
+
+                                            @if (delivery.Any())
+                                            {
+                                                var totalDifference = delivery.Sum(opads => opads.AcceptanceQuantity) - delivery.Sum(opads => opads.DeliveryQuantity);
+
+                                                foreach (var orderProductAddressDeliverySize in delivery)
+                                                {
+                                                    var difference = orderProductAddressDeliverySize.AcceptanceQuantity - orderProductAddressDeliverySize.DeliveryQuantity;
+
+                                                    <tr>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => orderProductAddressDeliverySize.Size.Name)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => orderProductAddressDeliverySize.DeliveryQuantity)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => orderProductAddressDeliverySize.AcceptanceQuantity)
+                                                        </td>
+
+                                                        @if (difference != 0)
+                                                        {
+                                                            <th>
+                                                                <strong class="text-danger">
+                                                                    @difference
+                                                                </strong>
+                                                            </th>
+                                                        }
+                                                        else
+                                                        {
+                                                            <th>
+                                                                @difference
+                                                            </th>
+                                                        }
+                                                    </tr>
+                                                }
+
+                                                <tr class="active">
+                                                    <th>
+                                                        Всего: @delivery.Count()
+                                                    </th>
+                                                    <th>
+                                                        @delivery.Sum(opads => opads.DeliveryQuantity)
+                                                    </th>
+                                                    <th>
+                                                        @delivery.Sum(opads => opads.AcceptanceQuantity)
+                                                    </th>
+                                                    @if (totalDifference != 0)
+                                                    {
+                                                        <th>
+                                                            <strong class="text-danger">
+                                                                @totalDifference
+                                                            </strong>
+                                                        </th>
+                                                    }
+                                                    else
+                                                    {
+                                                        <th>
+                                                            @totalDifference
+                                                        </th>
+                                                    }
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr class="active">
+                                                    <td colspan="4">Нет размерных данных</td>
+                                                </tr>
+                                            }
+                                        </table>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <table class="table table-condensed table-bordered">
+                            <tr class="active">
+                                <td>Нет поставок</td>
+                            </tr>
+                        </table>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

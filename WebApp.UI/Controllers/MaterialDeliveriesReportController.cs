@@ -21,10 +21,11 @@ namespace WebApp.UI.Controllers
             return View();
         }
 
-        public ActionResult _MaterialDeliveries(int productId = 0, int supplierId = 0, int materialId = 0)
+        public ActionResult _MaterialDeliveries(int orderId = 0, int productId = 0, int supplierId = 0, int materialId = 0)
         {
             MaterialDeliveriesReportViewModel model = new MaterialDeliveriesReportViewModel();
 
+            model.SelectedOrderId = orderId;
             model.SelectedProductId = productId;
             model.SelectedSupplierId = supplierId;
             model.SelectedMaterialId = materialId;
@@ -42,6 +43,11 @@ namespace WebApp.UI.Controllers
                 .Include(opdm => opdm.OrderProductDelivery.OrderProduct.OrderProductDeliveries)
                 .Include(opdm => opdm.OrderProductMaterial.Material)
                 .Include(opdm => opdm.OrderProductMaterial.Supplier);
+
+            if (orderId != 0)
+            {
+                orderProductDeliveryMaterials = orderProductDeliveryMaterials.Where(opdm => opdm.OrderId == orderId);
+            }
 
             if (productId != 0)
             {
@@ -65,6 +71,8 @@ namespace WebApp.UI.Controllers
                     model.OrderProductDeliveryMaterials.Add(orderProductDeliveryMaterial);
                 }
             }
+
+            model.Orders.Add(0, "Все");
 
             if (context.Orders.Any())
             {
@@ -101,6 +109,14 @@ namespace WebApp.UI.Controllers
                 foreach (var material in context.Materials)
                 {
                     model.Materials.Add(material.Id, material.Name);
+                }
+            }
+
+            if (context.OrderProductDeliveries.Any())
+            {
+                foreach (var orderProductDelivery in context.OrderProductDeliveries)
+                {
+                    model.Deliveries.Add(int.Parse($"{orderProductDelivery.OrderId}{orderProductDelivery.ProductId}{orderProductDelivery.DeliveryId}"), $"Накладная {orderProductDelivery.DeliveryId} от {orderProductDelivery.DeliveryDate.ToShortDateString()}");
                 }
             }
 
