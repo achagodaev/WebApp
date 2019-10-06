@@ -1,4 +1,4 @@
-﻿@model WebApp.UI.ViewModels.ReportViewModels.OrderProductMaterialsReportViewModel
+﻿@model WebApp.UI.ViewModels.ReportViewModels.ProductionMaterialsReportViewModel
 @using WebApp.UI.Models
 @using WebApp.UI.Controllers
 
@@ -28,8 +28,8 @@
                             @foreach (var order in Model.Orders)
                             {
                                 <li>
-                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductMaterials"
-                                       href="@Url.Action(nameof(OrderProductMaterialsReportController._OrderProductMaterials), new { orderId = order.Key })">
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#productionMaterials"
+                                       href="@Url.Action(nameof(ProductionMaterialsReportController._ProductionMaterials), new { orderId = order.Key, sortColumn = Model.SelectedSortColumn })">
                                         @order.Value
                                     </a>
                                 </li>
@@ -47,33 +47,33 @@
                         <div class="btn-group">
                             @if (Model.SelectedSortColumn == "name")
                             {
-                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductMaterials" class="btn btn-primary"
-                                   href="@Url.Action(nameof(OrderProductMaterialsReportController._OrderProductMaterials), new { orderId = Model.SelectedOrderId, sortColumn = "name" })">
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#productionMaterials" class="btn btn-primary"
+                                   href="@Url.Action(nameof(ProductionMaterialsReportController._ProductionMaterials), new { orderId = Model.SelectedOrderId, sortColumn = "name" })">
                                     Наименование
                                 </a>
 
                             }
                             else
                             {
-                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductMaterials" class="btn btn-default"
-                                   href="@Url.Action(nameof(OrderProductMaterialsReportController._OrderProductMaterials), new { orderId = Model.SelectedOrderId, sortColumn = "name" })">
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#productionMaterials" class="btn btn-default"
+                                   href="@Url.Action(nameof(ProductionMaterialsReportController._ProductionMaterials), new { orderId = Model.SelectedOrderId, sortColumn = "name" })">
                                     Наименование
                                 </a>
                             }
 
-                            @if (Model.SelectedSortColumn == "sum")
+                            @if (Model.SelectedSortColumn == "difference")
                             {
-                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductMaterials" class="btn btn-primary"
-                                   href="@Url.Action(nameof(OrderProductMaterialsReportController._OrderProductMaterials), new { orderId = Model.SelectedOrderId, sortColumn = "sum" })">
-                                    Сумма
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#productionMaterials" class="btn btn-primary"
+                                   href="@Url.Action(nameof(ProductionMaterialsReportController._ProductionMaterials), new { orderId = Model.SelectedOrderId, sortColumn = "difference" })">
+                                    +/-
                                 </a>
 
                             }
                             else
                             {
-                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductMaterials" class="btn btn-default"
-                                   href="@Url.Action(nameof(OrderProductMaterialsReportController._OrderProductMaterials), new { orderId = Model.SelectedOrderId, sortColumn = "sum" })">
-                                    Сумма
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#productionMaterials" class="btn btn-default"
+                                   href="@Url.Action(nameof(ProductionMaterialsReportController._ProductionMaterials), new { orderId = Model.SelectedOrderId, sortColumn = "difference" })">
+                                    +/-
                                 </a>
                             }
                         </div>
@@ -97,7 +97,31 @@
                                 .SelectMany(opa => opa.OrderProductAddressSizes)
                                 .Sum(s => s.Quantity);
 
-                            var orderProductPrice = orderProductQuantity * orderProduct.Price;
+                            var sizes = orderProduct.OrderProductAddresses
+                                .SelectMany(opa => opa.OrderProductAddressSizes)
+                                .GroupBy(opas => opas.SizeId);
+
+                            var productionSizes = orderProduct.OrderProductAddresses
+                                .SelectMany(opa => opa.OrderProductAddressProductionDates)
+                                .SelectMany(opapd => opapd.OrderProductAddressProductionDateSizes)
+                                .GroupBy(opapds => opapds.SizeId);
+
+                            var results = sizes.GroupJoin(productionSizes,
+                                size => size.Key,
+                                productionSize => productionSize.Key,
+                                (size, productionSize) => new
+                                {
+                                    SizeId = size.Key,
+                                    Quantity = size.Sum(s => s.Quantity),
+                                    FinishedProductsQuantity = productionSize.SingleOrDefault(s => s.Key == size.Key) != null
+                                        ? productionSize.Single(s => s.Key == size.Key).Sum(s => s.Quantity)
+                                        : 0,
+                                    Difference = productionSize.SingleOrDefault(s => s.Key == size.Key) != null
+                                        ? productionSize.Single(s => s.Key == size.Key).Sum(s => s.Quantity) - size.Sum(s => s.Quantity)
+                                        : 0 - size.Sum(s => s.Quantity)
+                                });
+
+                            var totalDifference = productionSizes.Sum(size => size.Sum(s => s.Quantity)) - sizes.Sum(size => size.Sum(s => s.Quantity));
 
                             <table class="table table-condensed table-bordered">
                                 <tr class="active">
@@ -107,9 +131,24 @@
                                 </tr>
                                 <tr class="active">
                                     <th>
-                                        Количество: @orderProductQuantity,
-                                        Цена: @Html.DisplayFor(modelItem => orderProduct.Price),
-                                        Сумма: @orderProductPrice
+                                        Заказ.Количество: @sizes.Sum(size => size.Sum(s => s.Quantity)),
+                                        Готовая продукция.Количество: @productionSizes.Sum(size => size.Sum(s => s.Quantity)),
+
+                                        @if (totalDifference != 0)
+                                        {
+                                            <strong>
+                                                Итого:
+                                            </strong>
+                                            <strong class="text-danger">
+                                                @totalDifference
+                                            </strong>
+                                        }
+                                        else
+                                        {
+                                            <strong>
+                                                Итого: @totalDifference
+                                            </strong>
+                                        }
                                     </th>
                                 </tr>
                             </table>
@@ -122,10 +161,9 @@
                                         <tr class="active">
                                             <th>Наименование</th>
                                             <th>Норма расхода</th>
+                                            <th>Поставлено</th>
                                             <th>Расход</th>
-                                            <th>Поставщик</th>
-                                            <th>Цена</th>
-                                            <th>Сумма</th>
+                                            <th>+/-</th>
                                         </tr>
 
                                         @if (orderProduct.OrderProductMaterials.Any())
@@ -137,15 +175,18 @@
                                                 orderProductMaterials = orderProductMaterials.OrderBy(opm => opm.Material.Name);
                                             }
 
-                                            if (Model.SelectedSortColumn == "sum")
+                                            if (Model.SelectedSortColumn == "difference")
                                             {
-                                                orderProductMaterials = orderProductMaterials.OrderByDescending(opm => (decimal)(orderProductQuantity * opm.Rate) * opm.Price);
+                                                orderProductMaterials = orderProductMaterials.OrderByDescending(opm => opm.OrderProductDeliveryMaterials.GroupBy(opdm => opdm.DeliveryId)
+                                                    .Sum(delivery => delivery.Sum(d => d.AcceptanceQuantity)) - (productionSizes.Sum(size => size.Sum(s => s.Quantity)) * opm.Rate));
                                             }
 
                                             foreach (var orderProductMaterial in orderProductMaterials)
                                             {
-                                                var orderProductMaterialQuantity = orderProductQuantity * orderProductMaterial.Rate;
-                                                var orderProductMaterialPrice = (decimal)(orderProductQuantity * orderProductMaterial.Rate) * orderProductMaterial.Price;
+                                                var deliveries = orderProductMaterial.OrderProductDeliveryMaterials.GroupBy(opdm => opdm.DeliveryId);
+                                                var materialsQuantity = deliveries.Sum(delivery => delivery.Sum(d => d.AcceptanceQuantity.HasValue ? d.AcceptanceQuantity.Value : 0));
+                                                var productionMaterialsQuantity = productionSizes.Sum(size => size.Sum(s => s.Quantity)) * orderProductMaterial.Rate;
+                                                var difference = materialsQuantity - productionMaterialsQuantity;
 
                                                 <tr>
                                                     <td>
@@ -155,34 +196,39 @@
                                                         @Html.DisplayFor(modelItem => orderProductMaterial.Rate)
                                                     </td>
                                                     <td>
-                                                        @orderProductMaterialQuantity
+                                                        @materialsQuantity
                                                     </td>
                                                     <td>
-                                                        @Html.DisplayFor(modelItem => orderProductMaterial.Supplier.Name)
+                                                        @productionMaterialsQuantity
                                                     </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => orderProductMaterial.Price)
-                                                    </td>
-                                                    <td>
-                                                        @orderProductMaterialPrice
-                                                    </td>
+
+                                                    @if (difference < 0)
+                                                    {
+                                                        <td>
+                                                            <strong class="text-danger">
+                                                                @difference
+                                                            </strong>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+                                                            @difference
+                                                        </td>
+                                                    }
                                                 </tr>
                                             }
 
                                             <tr class="active">
-                                                <th>
+                                                <th colspan="5">
                                                     Всего: @orderProduct.OrderProductMaterials.Count()
-                                                </th>
-                                                <th colspan="4"></th>
-                                                <th>
-                                                    @orderProduct.OrderProductMaterials.Sum(opm => (decimal)(orderProductQuantity * opm.Rate) * opm.Price)
                                                 </th>
                                             </tr>
                                         }
                                         else
                                         {
                                             <tr class="active">
-                                                <td colspan="6">Нет материалов</td>
+                                                <td colspan="5">Нет материалов</td>
                                             </tr>
                                         }
 
@@ -211,57 +257,75 @@
                                         materials = materials.OrderBy(m => Model.Materials[m.Key]);
                                     }
 
-                                    if (Model.SelectedSortColumn == "sum")
+                                    if (Model.SelectedSortColumn == "difference")
                                     {
-                                        materials = materials.OrderByDescending(m => m.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
-                                            .SelectMany(opa => opa.OrderProductAddressSizes)
-                                            .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price));
+                                        materials = materials.OrderByDescending(m => m.Sum(opm => opm.OrderProductDeliveryMaterials.GroupBy(opdm => opdm.DeliveryId)
+                                            .Sum(delivery => delivery.Sum(d => d.AcceptanceQuantity))) - (m.Sum(opm => opm.OrderProduct.OrderProductAddresses.SelectMany(opa => opa.OrderProductAddressProductionDates)
+                                            .SelectMany(opapd => opapd.OrderProductAddressProductionDateSizes)
+                                            .GroupBy(opapds => opapds.SizeId)
+                                            .Sum(size => size.Sum(s => s.Quantity)) * opm.Rate)));
                                     }
 
                                     <table class="table table-condensed table-bordered">
                                         <tr class="active">
                                             <th>Наименование</th>
+                                            <th>Поставлено</th>
                                             <th>Расход</th>
-                                            <th>Сумма</th>
+                                            <th>+/-</th>
                                         </tr>
 
                                         @if (materials.Any())
                                         {
                                             foreach (var material in materials)
                                             {
+                                                var deliveries = material.SelectMany(m => m.OrderProductDeliveryMaterials).GroupBy(opdm => opdm.DeliveryId);
+                                                var materialsQuantity = deliveries.Sum(delivery => delivery.Sum(d => d.AcceptanceQuantity.HasValue ? d.AcceptanceQuantity.Value : 0));
+
+                                                var productionMaterialsQuantity = material.Sum(m => m.OrderProduct.OrderProductAddresses.SelectMany(opa => opa.OrderProductAddressProductionDates)
+                                                    .SelectMany(opapd => opapd.OrderProductAddressProductionDateSizes)
+                                                    .GroupBy(opapds => opapds.SizeId)
+                                                    .Sum(size => size.Sum(s => s.Quantity)) * m.Rate);
+
+                                                var difference = materialsQuantity - productionMaterialsQuantity;
+
                                                 <tr>
                                                     <td>
                                                         @Model.Materials[material.Key]
                                                     </td>
                                                     <td>
-                                                        @material.Sum(opm => opm.OrderProduct.OrderProductAddresses
-                                                            .SelectMany(opa => opa.OrderProductAddressSizes)
-                                                            .Sum(opas => opas.Quantity) * opm.Rate)
+                                                        @materialsQuantity
                                                     </td>
                                                     <td>
-                                                        @material.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
-                                                            .SelectMany(opa => opa.OrderProductAddressSizes)
-                                                            .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price)
+                                                        @productionMaterialsQuantity
                                                     </td>
+
+                                                    @if (difference < 0)
+                                                    {
+                                                        <td>
+                                                            <strong class="text-danger">
+                                                                @difference
+                                                            </strong>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+                                                            @difference
+                                                        </td>
+                                                    }
                                                 </tr>
                                             }
 
                                             <tr class="active">
-                                                <th>
+                                                <th colspan="4">
                                                     Всего: @materials.Count()
-                                                </th>
-                                                <th></th>
-                                                <th>
-                                                    @materials.Sum(m => m.Sum(opm => (decimal)(opm.OrderProduct.OrderProductAddresses
-                                                        .SelectMany(opa => opa.OrderProductAddressSizes)
-                                                        .Sum(opas => opas.Quantity) * opm.Rate) * opm.Price))
                                                 </th>
                                             </tr>
                                         }
                                         else
                                         {
                                             <tr class="active">
-                                                <td colspan="2">Нет материалов</td>
+                                                <td colspan="45">Нет материалов</td>
                                             </tr>
                                         }
 
@@ -282,7 +346,6 @@
 
                 </div>
             </div>
-
         </div>
     </div>
 </div>

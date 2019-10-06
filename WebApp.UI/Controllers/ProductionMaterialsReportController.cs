@@ -12,7 +12,7 @@ using WebApp.UI.Repositories;
 
 namespace WebApp.UI.Controllers
 {
-    public class OrderProductMaterialsReportController : Controller
+    public class ProductionMaterialsReportController : Controller
     {
         private WebAppDbContext context = new WebAppDbContext();
 
@@ -21,9 +21,9 @@ namespace WebApp.UI.Controllers
             return View();
         }
 
-        public ActionResult _OrderProductMaterials(int orderId = 0, string sortColumn = "name")
+        public ActionResult _ProductionMaterials(int orderId = 0, string sortColumn = "name")
         {
-            OrderProductMaterialsReportViewModel model = new OrderProductMaterialsReportViewModel();
+            ProductionMaterialsReportViewModel model = new ProductionMaterialsReportViewModel();
 
             model.SelectedOrderId = orderId;
             model.SelectedSortColumn = sortColumn;
@@ -32,7 +32,12 @@ namespace WebApp.UI.Controllers
                 .Include(op => op.Order)
                 .Include(op => op.Product)
                 .Include(op => op.OrderProductAddresses)
+                .Include(op => op.OrderProductAddresses.Select(opa => opa.Address))
                 .Include(op => op.OrderProductAddresses.Select(opa => opa.OrderProductAddressSizes))
+                .Include(op => op.OrderProductAddresses.Select(opa => opa.OrderProductAddressSizes.Select(opas => opas.Size)))
+                .Include(op => op.OrderProductAddresses.Select(opa => opa.OrderProductAddressProductionDates))
+                .Include(op => op.OrderProductAddresses.Select(opa => opa.OrderProductAddressProductionDates.Select(opapd => opapd.OrderProductAddressProductionDateSizes)))
+                .Include(op => op.OrderProductAddresses.Select(opa => opa.OrderProductAddressProductionDates.Select(opapd => opapd.OrderProductAddressProductionDateSizes.Select(opapds => opapds.Size))))
                 .Include(op => op.OrderProductMaterials)
                 .Include(op => op.OrderProductMaterials.Select(opm => opm.Material))
                 .Include(op => op.OrderProductMaterials.Select(opm => opm.Supplier))
