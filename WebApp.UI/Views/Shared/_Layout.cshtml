@@ -86,6 +86,11 @@
                                     nameof(MaterialDeliveriesReportController).Replace("Controller", ""))
                             </li>
                             <li>
+                                @Html.ActionLink("Приемки материалов",
+                                    nameof(MaterialAcceptancesReportController.Index),
+                                    nameof(MaterialAcceptancesReportController).Replace("Controller", ""))
+                            </li>
+                            <li>
                                 @Html.ActionLink("Поставки готовой продукции",
                                     nameof(ProductDeliveriesReportController.Index),
                                     nameof(ProductDeliveriesReportController).Replace("Controller", ""))

@@ -1,0 +1,256 @@
+﻿@model WebApp.UI.ViewModels.ReportViewModels.MaterialAcceptancesReportViewModel
+@using WebApp.UI.Models
+@using WebApp.UI.Controllers
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedOrderId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Orders[Model.SelectedOrderId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var order in Model.Orders)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materialAcceptances"
+                                       href="@Url.Action(nameof(MaterialAcceptancesReportController._MaterialAcceptances), new { orderId = order.Key, productId = Model.SelectedProductId, supplierId = Model.SelectedSupplierId, materialId = Model.SelectedMaterialId })">
+                                        @order.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedProductId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Products[Model.SelectedProductId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var product in Model.Products)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materialAcceptances"
+                                       href="@Url.Action(nameof(MaterialAcceptancesReportController._MaterialAcceptances), new { orderId = Model.SelectedOrderId, productId = product.Key, supplierId = Model.SelectedSupplierId, materialId = Model.SelectedMaterialId })">
+                                        @product.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedSupplierId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Suppliers[Model.SelectedSupplierId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var supplier in Model.Suppliers)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materialAcceptances"
+                                       href="@Url.Action(nameof(MaterialAcceptancesReportController._MaterialAcceptances), new { orderId = Model.SelectedOrderId, productId = Model.SelectedProductId, supplierId = supplier.Key, materialId = Model.SelectedMaterialId })">
+                                        @supplier.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedMaterialId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Model.Materials[Model.SelectedMaterialId]
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach (var material in Model.Materials)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#materialAcceptances"
+                                       href="@Url.Action(nameof(MaterialAcceptancesReportController._MaterialAcceptances), new { orderId = Model.SelectedOrderId, productId = Model.SelectedProductId, supplierId = Model.SelectedSupplierId, materialId = material.Key })">
+                                        @material.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Приемки", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+
+                    @if (Model.OrderProductDeliveryMaterials.Any())
+                    {
+                        var acceptances = Model.OrderProductDeliveryMaterials.GroupBy(opdm => new { opdm.OrderId, opdm.ProductId, opdm.OrderProductDelivery.AcceptanceId });
+
+                        if (acceptances.Any())
+                        {
+                            var acceptanceIndex = 0;
+
+                            foreach (var acceptance in acceptances)
+                            {
+                                acceptanceIndex++;
+
+                                <table class="table table-condensed table-bordered">
+                                    <tr class="active">
+                                        <th>
+                                            @acceptanceIndex. @Model.Acceptances[int.Parse($"{acceptance.Key.OrderId}{acceptance.Key.ProductId}{acceptance.Key.AcceptanceId}")]
+                                        </th>
+                                    </tr>
+                                    <tr class="active">
+                                        <th>
+                                            Заказ: @Model.Orders[acceptance.Key.OrderId]
+                                        </th>
+                                    </tr>
+                                    <tr class="active">
+                                        <th>
+                                            Продукция: @Model.Products[acceptance.Key.ProductId]
+                                        </th>
+                                    </tr>
+                                </table>
+
+                                <div class="form-group">
+                                    @Html.Label("Поставки", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+
+                                        @{
+                                            var deliveries = acceptance.GroupBy(a => a.DeliveryId);
+
+                                            if (deliveries.Any())
+                                            {
+                                                var deliveryIndex = 0;
+
+                                                foreach (var delivery in deliveries)
+                                                {
+                                                    deliveryIndex++;
+
+                                                    <table class="table table-condensed table-bordered">
+                                                        <tr class="active">
+                                                            <th>
+                                                                @deliveryIndex. @Model.Deliveries[int.Parse($"{acceptance.Key.OrderId}{acceptance.Key.ProductId}{delivery.Key}")]
+                                                            </th>
+                                                        </tr>
+                                                    </table>
+
+                                                    <div class="form-group">
+                                                        @Html.Label("Материалы", htmlAttributes: new { @class = "control-label col-md-2" })
+                                                        <div class="col-md-10">
+                                                            <table class="table table-condensed table-bordered">
+                                                                <tr class="active">
+                                                                    <th rowspan="2">Наименование</th>
+                                                                    <th rowspan="2">Поставщик</th>
+                                                                    <th colspan="2">Количество</th>
+                                                                    <th rowspan="2">+/-</th>
+                                                                </tr>
+                                                                <tr class="active">
+                                                                    <th>Поставка</th>
+                                                                    <th>Приемка</th>
+                                                                </tr>
+
+                                                                @foreach (var orderProductDeliveryMaterial in delivery)
+                                                                {
+                                                                    double difference = 0;
+
+                                                                    if (orderProductDeliveryMaterial.AcceptanceQuantity.HasValue)
+                                                                    {
+                                                                        difference = orderProductDeliveryMaterial.AcceptanceQuantity.Value - orderProductDeliveryMaterial.DeliveryQuantity;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        difference = 0 - orderProductDeliveryMaterial.DeliveryQuantity;
+                                                                    }
+
+                                                                    <tr>
+                                                                        <td>
+                                                                            @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.Material.Name)
+                                                                        </td>
+                                                                        <td>
+                                                                            @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.OrderProductMaterial.Supplier.Name)
+                                                                        </td>
+                                                                        <td>
+                                                                            @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.DeliveryQuantity)
+                                                                        </td>
+                                                                        <td>
+                                                                            @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.AcceptanceQuantity)
+                                                                        </td>
+
+                                                                        @if (difference != 0)
+                                                                        {
+                                                                            <td>
+                                                                                <strong class="text-danger">
+                                                                                    @difference
+                                                                                </strong>
+                                                                            </td>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td>
+                                                                                @difference
+                                                                            </td>
+                                                                        }
+                                                                    </tr>
+                                                                }
+
+                                                                <tr class="active">
+                                                                    <th colspan="5">
+                                                                        Всего: @delivery.Count()
+                                                                    </th>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <table class="table table-condensed table-bordered">
+                                                    <tr class="active">
+                                                        <td>Нет поставок</td>
+                                                    </tr>
+                                                </table>
+                                            }
+                                        }
+
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <table class="table table-condensed table-bordered">
+                            <tr class="active">
+                                <td>Нет приемок</td>
+                            </tr>
+                        </table>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

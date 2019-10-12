@@ -75,6 +75,22 @@
                                     По поставкам
                                 </a>
                             }
+
+                            @if (Model.SelectedGroupBy == "acceptance")
+                            {
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductDeliveryMaterials" class="btn btn-primary"
+                                   href="@Url.Action(nameof(OrderProductDeliveryMaterialsReportController._OrderProductDeliveryMaterials), new { orderId = Model.SelectedOrderId, groupBy = "acceptance" })">
+                                    По приемкам
+                                </a>
+
+                            }
+                            else
+                            {
+                                <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductDeliveryMaterials" class="btn btn-default"
+                                   href="@Url.Action(nameof(OrderProductDeliveryMaterialsReportController._OrderProductDeliveryMaterials), new { orderId = Model.SelectedOrderId, groupBy = "acceptance" })">
+                                    По приемкам
+                                </a>
+                            }
                         </div>
                     </div>
                 </div>
@@ -385,7 +401,7 @@
                                                             @if (orderProductDelivery.AcceptanceId.HasValue && orderProductDelivery.AcceptanceDate.HasValue)
                                                             {
                                                                 <th>
-                                                                    @orderProductDeliveryIndex. 
+                                                                    @orderProductDeliveryIndex.
 
                                                                     Накладная
                                                                     @Html.ActionLink($"{orderProductDelivery.DeliveryId} от {orderProductDelivery.DeliveryDate.ToShortDateString()}",
@@ -504,6 +520,239 @@
                                                 <table class="table table-condensed table-bordered">
                                                     <tr class="active">
                                                         <td>Нет поставок</td>
+                                                    </tr>
+                                                </table>
+                                            }
+                                        }
+
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <table class="table table-condensed table-bordered">
+                                <tr class="active">
+                                    <td>Нет продукции</td>
+                                </tr>
+                            </table>
+                        }
+
+                    </div>
+                </div>
+            }
+
+            @if (Model.SelectedGroupBy == "acceptance")
+            {
+                <div class="form-group">
+                    @Html.Label("Продукция", htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+
+                        @if (Model.OrderProducts.Any())
+                        {
+                            var orderProductIndex = 0;
+
+                            foreach (var orderProduct in Model.OrderProducts)
+                            {
+                                orderProductIndex++;
+
+                                var orderProductQuantity = orderProduct.OrderProductAddresses
+                                    .SelectMany(opa => opa.OrderProductAddressSizes)
+                                    .Sum(s => s.Quantity);
+
+                                <table class="table table-condensed table-bordered">
+                                    <tr class="active">
+                                        <th>
+                                            @orderProductIndex. @Html.DisplayFor(modelItem => orderProduct.Product.Name)
+                                        </th>
+                                    </tr>
+                                    <tr class="active">
+                                        <th>
+                                            Количество: @orderProductQuantity
+                                        </th>
+                                    </tr>
+                                </table>
+
+                                <div class="form-group">
+                                    @Html.Label("Приемки", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+
+                                        @{
+                                            var acceptances = orderProduct.OrderProductDeliveries.GroupBy(opd => opd.AcceptanceId);
+
+                                            var acceptanceIndex = 0;
+
+                                            if (acceptances.Any())
+                                            {
+                                                foreach (var acceptance in acceptances)
+                                                {
+                                                    acceptanceIndex++;
+
+                                                    var orderProductAcceptance = orderProduct.OrderProductDeliveries.First(opd => opd.AcceptanceId == acceptance.Key);
+
+                                                    <table class="table table-condensed table-bordered">
+                                                        <tr class="active">
+                                                            @if (acceptance.Key.HasValue && orderProductAcceptance.AcceptanceDate.HasValue)
+                                                            {
+                                                                <th>
+                                                                    @acceptanceIndex.
+
+                                                                    Акт приемки
+                                                                    @Html.ActionLink($"{orderProductAcceptance.AcceptanceId.Value} от {orderProductAcceptance.AcceptanceDate.Value.ToShortDateString()}",
+                                                                        nameof(FilesController.GetImage),
+                                                                        nameof(FilesController).Replace("Controller", ""),
+                                                                        new { path = orderProductAcceptance.AcceptanceImagePath },
+                                                                        new { target = "_blank" })
+                                                                </th>
+                                                            }
+                                                            else
+                                                            {
+                                                                <th>
+                                                                    @acceptanceIndex. Акт приемки номер @orderProductAcceptance.DeliveryId от @orderProductAcceptance.DeliveryDate.ToShortDateString()
+                                                                </th>
+                                                            }
+                                                        </tr>
+                                                    </table>
+
+                                                    <div class="form-group">
+                                                        @Html.Label("Поставки", htmlAttributes: new { @class = "control-label col-md-2" })
+                                                        <div class="col-md-10">
+
+                                                            @{
+                                                                var deliveries = orderProduct.OrderProductDeliveries.Where(opd => opd.AcceptanceId == acceptance.Key);
+
+                                                                var deliveryIndex = 0;
+
+                                                                if (deliveries.Any())
+                                                                {
+                                                                    foreach (var delivery in deliveries)
+                                                                    {
+                                                                        deliveryIndex++;
+
+                                                                        <table class="table table-condensed table-bordered">
+                                                                            <tr class="active">
+                                                                                <th>
+                                                                                    @deliveryIndex.
+                                                                                
+                                                                                    Накладная
+                                                                                    @Html.ActionLink($"{delivery.DeliveryId} от {delivery.DeliveryDate.ToShortDateString()}",
+                                                                                        nameof(FilesController.GetImage),
+                                                                                        nameof(FilesController).Replace("Controller", ""),
+                                                                                        new { path = delivery.DeliveryImagePath },
+                                                                                        new { target = "_blank" })
+                                                                                </th>
+                                                                            </tr>
+                                                                        </table>
+
+                                                                        <div class="form-group">
+                                                                            @Html.Label("Материалы", htmlAttributes: new { @class = "control-label col-md-2" })
+                                                                            <div class="col-md-10">
+                                                                                <table class="table table-condensed table-bordered">
+
+                                                                                    @if (delivery.OrderProductDeliveryMaterials.Any())
+                                                                                    {
+                                                                                        <tr class="active">
+                                                                                            <th rowspan="2">Наименование</th>
+                                                                                            <th rowspan="2">Поставщик</th>
+                                                                                            <th colspan="2">Количество</th>
+                                                                                            <th rowspan="2">+/-</th>
+                                                                                        </tr>
+                                                                                        <tr class="active">
+                                                                                            <th>Поставка</th>
+                                                                                            <th>Приемка</th>
+                                                                                        </tr>
+
+                                                                                        foreach (var orderProductDeliveryMaterial in delivery.OrderProductDeliveryMaterials)
+                                                                                        {
+                                                                                            double difference = 0;
+
+                                                                                            if (orderProductDeliveryMaterial.AcceptanceQuantity.HasValue)
+                                                                                            {
+                                                                                                difference = orderProductDeliveryMaterial.AcceptanceQuantity.Value - orderProductDeliveryMaterial.DeliveryQuantity;
+                                                                                            }
+                                                                                            else
+                                                                                            {
+                                                                                                difference = 0 - orderProductDeliveryMaterial.DeliveryQuantity;
+                                                                                            }
+
+                                                                                            <tr>
+                                                                                                <td>
+                                                                                                    @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.Material.Name)
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.OrderProductMaterial.Supplier.Name)
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.DeliveryQuantity)
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    @Html.DisplayFor(modelItem => orderProductDeliveryMaterial.AcceptanceQuantity)
+                                                                                                </td>
+
+                                                                                                @if (difference != 0)
+                                                                                                {
+                                                                                                    <td>
+                                                                                                        <strong class="text-danger">
+                                                                                                            @difference
+                                                                                                        </strong>
+                                                                                                    </td>
+                                                                                                }
+                                                                                                else
+                                                                                                {
+                                                                                                    <td>
+                                                                                                        @difference
+                                                                                                    </td>
+                                                                                                }
+                                                                                            </tr>
+                                                                                        }
+
+                                                                                        <tr class="active">
+                                                                                            <th colspan="5">
+                                                                                                Всего: @delivery.OrderProductDeliveryMaterials.Count()
+                                                                                            </th>
+                                                                                        </tr>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <tr class="active">
+                                                                                            <th rowspan="2">Наименование</th>
+                                                                                            <th rowspan="2">Поставщик</th>
+                                                                                            <th colspan="2">Количество</th>
+                                                                                            <th rowspan="2">+/-</th>
+                                                                                        </tr>
+                                                                                        <tr class="active">
+                                                                                            <th>Поставка</th>
+                                                                                            <th>Приемка</th>
+                                                                                        </tr>
+                                                                                        <tr class="active">
+                                                                                            <td colspan="5">Нет материалов</td>
+                                                                                        </tr>
+                                                                                    }
+
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <table class="table table-condensed table-bordered">
+                                                                        <tr class="active">
+                                                                            <td>Нет поставок</td>
+                                                                        </tr>
+                                                                    </table>
+                                                                }
+                                                            }
+
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <table class="table table-condensed table-bordered">
+                                                    <tr class="active">
+                                                        <td>Нет приемок</td>
                                                     </tr>
                                                 </table>
                                             }
