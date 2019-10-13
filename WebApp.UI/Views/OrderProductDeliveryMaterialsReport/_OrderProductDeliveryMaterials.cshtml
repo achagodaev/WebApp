@@ -184,16 +184,12 @@
 
                                                                 <table class="table table-condensed table-bordered">
                                                                     <tr class="active">
-                                                                        <th colspan="2">Накладная</th>
-                                                                        <th colspan="2">Акт приемки</th>
+                                                                        <th rowspan="2">Накладная</th>
+                                                                        <th rowspan="2">Акт приемки</th>
                                                                         <th colspan="2">Количество</th>
                                                                         <th rowspan="2">+/-</th>
                                                                     </tr>
                                                                     <tr class="active">
-                                                                        <th>Номер</th>
-                                                                        <th>Дата</th>
-                                                                        <th>Номер</th>
-                                                                        <th>Дата</th>
                                                                         <th>Поставка</th>
                                                                         <th>Приемка</th>
                                                                     </tr>
@@ -209,34 +205,19 @@
 
                                                                             <tr>
                                                                                 <td>
-                                                                                    @Html.ActionLink(delivery.Key.ToString(),
+                                                                                    @Html.ActionLink($"{orderProductDelivery.DeliveryId} от {orderProductDelivery.DeliveryDate.ToShortDateString()}",
                                                                                         nameof(FilesController.GetImage),
                                                                                         nameof(FilesController).Replace("Controller", ""),
                                                                                         new { path = orderProductDelivery.DeliveryImagePath },
                                                                                         new { target = "_blank" })
                                                                                 </td>
                                                                                 <td>
-                                                                                    @orderProductDelivery.DeliveryDate.ToShortDateString()
-                                                                                </td>
-                                                                                <td>
-                                                                                    @Html.ActionLink(orderProductDelivery.AcceptanceId.ToString(),
+                                                                                    @Html.ActionLink($"{orderProductDelivery.AcceptanceId} от {orderProductDelivery.AcceptanceDate.Value.ToShortDateString()}",
                                                                                         nameof(FilesController.GetImage),
                                                                                         nameof(FilesController).Replace("Controller", ""),
                                                                                         new { path = orderProductDelivery.AcceptanceImagePath },
                                                                                         new { target = "_blank" })
                                                                                 </td>
-
-                                                                                @if (orderProductDelivery.AcceptanceDate.HasValue)
-                                                                                {
-                                                                                    <td>
-                                                                                        @orderProductDelivery.AcceptanceDate.Value.ToShortDateString()
-                                                                                    </td>
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    <td></td>
-                                                                                }
-
                                                                                 <td>
                                                                                     @delivery.Sum(d => d.DeliveryQuantity)
                                                                                 </td>
@@ -262,7 +243,7 @@
                                                                         }
 
                                                                         <tr class="active">
-                                                                            <th colspan="4">
+                                                                            <th colspan="2">
                                                                                 Всего: @deliveries.Count()
                                                                             </th>
                                                                             <th>
@@ -296,7 +277,7 @@
 
                                                                             @if (total != 0)
                                                                             {
-                                                                                <th colspan="7" class="text-right">
+                                                                                <th colspan="5" class="text-right">
                                                                                     Заказано/Поставлено:
                                                                                     <strong class="text-danger">
                                                                                         @total
@@ -431,19 +412,19 @@
                                                         @Html.Label("Материалы", htmlAttributes: new { @class = "control-label col-md-2" })
                                                         <div class="col-md-10">
                                                             <table class="table table-condensed table-bordered">
+                                                                <tr class="active">
+                                                                    <th rowspan="2">Наименование</th>
+                                                                    <th rowspan="2">Поставщик</th>
+                                                                    <th colspan="2">Количество</th>
+                                                                    <th rowspan="2">+/-</th>
+                                                                </tr>
+                                                                <tr class="active">
+                                                                    <th>Поставка</th>
+                                                                    <th>Приемка</th>
+                                                                </tr>
+
                                                                 @if (orderProductDelivery.OrderProductDeliveryMaterials.Any())
                                                                 {
-                                                                    <tr class="active">
-                                                                        <th rowspan="2">Наименование</th>
-                                                                        <th rowspan="2">Поставщик</th>
-                                                                        <th colspan="2">Количество</th>
-                                                                        <th rowspan="2">+/-</th>
-                                                                    </tr>
-                                                                    <tr class="active">
-                                                                        <th>Поставка</th>
-                                                                        <th>Приемка</th>
-                                                                    </tr>
-
                                                                     foreach (var orderProductDeliveryMaterial in orderProductDelivery.OrderProductDeliveryMaterials)
                                                                     {
                                                                         double difference = 0;
@@ -496,16 +477,6 @@
                                                                 }
                                                                 else
                                                                 {
-                                                                    <tr class="active">
-                                                                        <th rowspan="2">Наименование</th>
-                                                                        <th rowspan="2">Поставщик</th>
-                                                                        <th colspan="2">Количество</th>
-                                                                        <th rowspan="2">+/-</th>
-                                                                    </tr>
-                                                                    <tr class="active">
-                                                                        <th>Поставка</th>
-                                                                        <th>Приемка</th>
-                                                                    </tr>
                                                                     <tr class="active">
                                                                         <td colspan="5">Нет материалов</td>
                                                                     </tr>

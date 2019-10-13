@@ -14,8 +14,8 @@ namespace WebApp.UI.ViewModels.ReportViewModels
             Orders = new Dictionary<int, string>();
             Products = new Dictionary<int, string>();
             Addresses = new Dictionary<int, string>();
-            Deliveries = new Dictionary<int, string>();
 
+            OrderProductDeliveries = new List<OrderProductDelivery>();
             OrderProductAddressDeliverySizes = new List<OrderProductAddressDeliverySize>();
         }
 
@@ -34,7 +34,7 @@ namespace WebApp.UI.ViewModels.ReportViewModels
 
         public Dictionary<int, string> Addresses { get; set; }
 
-        public Dictionary<int, string> Deliveries { get; set; }
+        public List<OrderProductDelivery> OrderProductDeliveries { get; set; }
 
         public List<OrderProductAddressDeliverySize> OrderProductAddressDeliverySizes { get; set; }
     }

@@ -1,5 +1,4 @@
 ﻿@model WebApp.UI.ViewModels.ReportViewModels.MaterialDeliveriesReportViewModel
-@using WebApp.UI.Models
 @using WebApp.UI.Controllers
 
 <div class="row">
@@ -114,10 +113,19 @@
                             {
                                 deliveryIndex++;
 
+                                var orderProductDelivery = Model.OrderProductDeliveries.Single(opd => opd.DeliveryId == delivery.Key.DeliveryId);
+
                                 <table class="table table-condensed table-bordered">
                                     <tr class="active">
                                         <th>
-                                            @deliveryIndex. @Model.Deliveries[int.Parse($"{delivery.Key.OrderId}{delivery.Key.ProductId}{delivery.Key.DeliveryId}")]
+                                            @deliveryIndex.
+
+                                            Накладная
+                                            @Html.ActionLink($"{orderProductDelivery.DeliveryId} от {orderProductDelivery.DeliveryDate.ToShortDateString()}",
+                                                nameof(FilesController.GetImage),
+                                                nameof(FilesController).Replace("Controller", ""),
+                                                new { path = orderProductDelivery.DeliveryImagePath },
+                                                new { target = "_blank" })
                                         </th>
                                     </tr>
                                     <tr class="active">

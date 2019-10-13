@@ -1,5 +1,4 @@
 ﻿@model WebApp.UI.ViewModels.ReportViewModels.MaterialAcceptancesReportViewModel
-@using WebApp.UI.Models
 @using WebApp.UI.Controllers
 
 <div class="row">
@@ -114,10 +113,19 @@
                             {
                                 acceptanceIndex++;
 
+                                var orderProductAcceptance = Model.OrderProductAcceptances.Single(opa => opa.AcceptanceId == acceptance.Key.AcceptanceId);
+
                                 <table class="table table-condensed table-bordered">
                                     <tr class="active">
                                         <th>
-                                            @acceptanceIndex. @Model.Acceptances[int.Parse($"{acceptance.Key.OrderId}{acceptance.Key.ProductId}{acceptance.Key.AcceptanceId}")]
+                                            @acceptanceIndex.
+
+                                            Акт приемки
+                                            @Html.ActionLink($"{orderProductAcceptance.AcceptanceId} от {orderProductAcceptance.AcceptanceDate.Value.ToShortDateString()}",
+                                                nameof(FilesController.GetImage),
+                                                nameof(FilesController).Replace("Controller", ""),
+                                                new { path = orderProductAcceptance.AcceptanceImagePath },
+                                                new { target = "_blank" })
                                         </th>
                                     </tr>
                                     <tr class="active">
@@ -147,10 +155,19 @@
                                                 {
                                                     deliveryIndex++;
 
+                                                    var orderProductDelivery = Model.OrderProductDeliveries.Single(opd => opd.DeliveryId == delivery.Key);
+
                                                     <table class="table table-condensed table-bordered">
                                                         <tr class="active">
                                                             <th>
-                                                                @deliveryIndex. @Model.Deliveries[int.Parse($"{acceptance.Key.OrderId}{acceptance.Key.ProductId}{delivery.Key}")]
+                                                                @deliveryIndex. 
+
+                                                                Накладная
+                                                                @Html.ActionLink($"{orderProductDelivery.DeliveryId} от {orderProductDelivery.DeliveryDate.ToShortDateString()}",
+                                                                    nameof(FilesController.GetImage),
+                                                                    nameof(FilesController).Replace("Controller", ""),
+                                                                    new { path = orderProductDelivery.DeliveryImagePath },
+                                                                    new { target = "_blank" })         
                                                             </th>
                                                         </tr>
                                                     </table>

@@ -29,6 +29,8 @@ namespace WebApp.UI.Controllers
             model.SelectedProductId = productId;
             model.SelectedAddressId = addressId;
 
+            IQueryable<OrderProductDelivery> orderProductDeliveries = context.OrderProductDeliveries;
+
             IQueryable<OrderProductAddressDeliverySize> orderProductAddressDeliverySizes = context.OrderProductAddressDeliverySizes
                 .Include(opads => opads.Size)
                 .Include(opads => opads.OrderProductAddressDelivery.OrderProductAddress.OrderProduct.Order)
@@ -40,17 +42,27 @@ namespace WebApp.UI.Controllers
 
             if (orderId != 0)
             {
+                orderProductDeliveries = orderProductDeliveries.Where(opd => opd.OrderId == orderId);
                 orderProductAddressDeliverySizes = orderProductAddressDeliverySizes.Where(opads => opads.OrderId == orderId);
             }
 
             if (productId != 0)
             {
+                orderProductDeliveries = orderProductDeliveries.Where(opd => opd.ProductId == productId);
                 orderProductAddressDeliverySizes = orderProductAddressDeliverySizes.Where(opads => opads.ProductId == productId);
             }
 
             if (addressId != 0)
             {
                 orderProductAddressDeliverySizes = orderProductAddressDeliverySizes.Where(opads => opads.AddressId == addressId);
+            }
+
+            if (orderProductDeliveries.Any())
+            {
+                foreach (var orderProductDelivery in orderProductDeliveries)
+                {
+                    model.OrderProductDeliveries.Add(orderProductDelivery);
+                }
             }
 
             if (orderProductAddressDeliverySizes.Any())
@@ -88,14 +100,6 @@ namespace WebApp.UI.Controllers
                 foreach (var address in context.Addresses)
                 {
                     model.Addresses.Add(address.Id, address.Name);
-                }
-            }
-
-            if (context.OrderProductAddressDeliveries.Any())
-            {
-                foreach (var orderProductAddressDelivery in context.OrderProductAddressDeliveries)
-                {
-                    model.Deliveries.Add(int.Parse($"{orderProductAddressDelivery.OrderId}{orderProductAddressDelivery.ProductId}{orderProductAddressDelivery.AddressId}{orderProductAddressDelivery.DeliveryId}"), $"Накладная {orderProductAddressDelivery.DeliveryId} от {orderProductAddressDelivery.DeliveryDate.ToShortDateString()}");
                 }
             }
 

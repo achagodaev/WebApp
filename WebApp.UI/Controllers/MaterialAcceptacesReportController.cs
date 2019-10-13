@@ -30,6 +30,8 @@ namespace WebApp.UI.Controllers
             model.SelectedSupplierId = supplierId;
             model.SelectedMaterialId = materialId;
 
+            IQueryable<OrderProductDelivery> orderProductDeliveries = context.OrderProductDeliveries;
+
             IQueryable<OrderProductDeliveryMaterial> orderProductDeliveryMaterials = context.OrderProductDeliveryMaterials
                 .Include(opdm => opdm.Material)
                 .Include(opdm => opdm.OrderProductDelivery.OrderProduct.Order)
@@ -46,11 +48,13 @@ namespace WebApp.UI.Controllers
 
             if (orderId != 0)
             {
+                orderProductDeliveries = orderProductDeliveries.Where(opd => opd.OrderId == orderId);
                 orderProductDeliveryMaterials = orderProductDeliveryMaterials.Where(opdm => opdm.OrderId == orderId);
             }
 
             if (productId != 0)
             {
+                orderProductDeliveries = orderProductDeliveries.Where(opd => opd.ProductId == productId);
                 orderProductDeliveryMaterials = orderProductDeliveryMaterials.Where(opdm => opdm.ProductId == productId);
             }
 
@@ -62,6 +66,24 @@ namespace WebApp.UI.Controllers
             if (materialId != 0)
             {
                 orderProductDeliveryMaterials = orderProductDeliveryMaterials.Where(opdm => opdm.MaterialId == materialId);
+            }
+
+            if (orderProductDeliveries.Any())
+            {
+                foreach (var orderProductDelivery in orderProductDeliveries)
+                {
+                    model.OrderProductDeliveries.Add(orderProductDelivery);
+
+                    if (orderProductDelivery.AcceptanceId.HasValue && orderProductDelivery.AcceptanceDate.HasValue)
+                    {
+                        var orderProductAcceptance = model.OrderProductAcceptances.FirstOrDefault(opa => opa.OrderId == orderProductDelivery.OrderId && opa.ProductId == orderProductDelivery.ProductId && opa.AcceptanceId == orderProductDelivery.AcceptanceId);
+
+                        if (orderProductAcceptance == null)
+                        {
+                            model.OrderProductAcceptances.Add(orderProductDelivery);
+                        }
+                    }
+                }
             }
 
             if (orderProductDeliveryMaterials.Any())
@@ -109,28 +131,6 @@ namespace WebApp.UI.Controllers
                 foreach (var material in context.Materials)
                 {
                     model.Materials.Add(material.Id, material.Name);
-                }
-            }
-
-            if (context.OrderProductDeliveries.Any())
-            {
-                foreach (var orderProductDelivery in context.OrderProductDeliveries)
-                {
-                    model.Deliveries.Add(int.Parse($"{orderProductDelivery.OrderId}{orderProductDelivery.ProductId}{orderProductDelivery.DeliveryId}"), $"Накладная {orderProductDelivery.DeliveryId} от {orderProductDelivery.DeliveryDate.ToShortDateString()}");
-                }
-            }
-
-            if (context.OrderProductDeliveries.Any())
-            {
-                foreach (var orderProductDelivery in context.OrderProductDeliveries)
-                {
-                    if (orderProductDelivery.AcceptanceId.HasValue && orderProductDelivery.AcceptanceDate.HasValue)
-                    {
-                        if (!model.Acceptances.ContainsKey(int.Parse($"{orderProductDelivery.OrderId}{orderProductDelivery.ProductId}{orderProductDelivery.AcceptanceId}")))
-                        {
-                            model.Acceptances.Add(int.Parse($"{orderProductDelivery.OrderId}{orderProductDelivery.ProductId}{orderProductDelivery.AcceptanceId}"), $"Акт приемки {orderProductDelivery.AcceptanceId} от {orderProductDelivery.AcceptanceDate.Value.ToShortDateString()}");
-                        }
-                    }
                 }
             }
 

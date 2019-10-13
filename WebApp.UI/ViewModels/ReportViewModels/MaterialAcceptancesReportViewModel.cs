@@ -15,9 +15,9 @@ namespace WebApp.UI.ViewModels.ReportViewModels
             Products = new Dictionary<int, string>();
             Suppliers = new Dictionary<int, string>();
             Materials = new Dictionary<int, string>();
-            Deliveries = new Dictionary<int, string>();
-            Acceptances = new Dictionary<int, string>();
 
+            OrderProductDeliveries = new List<OrderProductDelivery>();
+            OrderProductAcceptances = new List<OrderProductDelivery>();
             OrderProductDeliveryMaterials = new List<OrderProductDeliveryMaterial>();
         }
 
@@ -41,9 +41,9 @@ namespace WebApp.UI.ViewModels.ReportViewModels
 
         public Dictionary<int, string> Materials { get; set; }
 
-        public Dictionary<int, string> Deliveries { get; set; }
+        public List<OrderProductDelivery> OrderProductDeliveries { get; set; }
 
-        public Dictionary<int, string> Acceptances { get; set; }
+        public List<OrderProductDelivery> OrderProductAcceptances { get; set; }
 
         public List<OrderProductDeliveryMaterial> OrderProductDeliveryMaterials { get; set; }
     }
