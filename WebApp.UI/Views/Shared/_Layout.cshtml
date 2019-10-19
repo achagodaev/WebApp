@@ -76,6 +76,11 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li>
+                                @Html.ActionLink("Заказы",
+                                    nameof(OrdersReportController.Index),
+                                    nameof(OrdersReportController).Replace("Controller", ""))
+                            </li>
+                            <li>
                                 @Html.ActionLink("Материалы",
                                     nameof(MaterialsReportController.Index),
                                     nameof(MaterialsReportController).Replace("Controller", ""))
@@ -98,6 +103,11 @@
 
                             <li role="separator" class="divider"></li>
 
+                            <li>
+                                @Html.ActionLink("Продукция заказа",
+                                    nameof(OrderProductAddressesReportController.Index),
+                                    nameof(OrderProductAddressesReportController).Replace("Controller", ""))
+                            </li>
                             <li>
                                 @Html.ActionLink("Размерные данные продукции заказа",
                                     nameof(OrderProductAddressSizesReportController.Index),

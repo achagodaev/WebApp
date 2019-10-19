@@ -129,6 +129,8 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\MaterialAcceptacesReportController.cs" />
+    <Compile Include="Controllers\OrdersReportController.cs" />
+    <Compile Include="Controllers\OrderProductAddressesReportController.cs" />
     <Compile Include="Controllers\ProductionMaterialsReportController.cs" />
     <Compile Include="Controllers\ProductDeliveriesReportController.cs" />
     <Compile Include="Controllers\MaterialDeliveriesReportController.cs" />
@@ -270,6 +272,7 @@
     <Compile Include="ViewModels\ProductViewModels\EditProductViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModels\MaterialAcceptancesReportViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModels\MaterialDeliveriesReportViewModel.cs" />
+    <Compile Include="ViewModels\ReportViewModels\OrderProductAddressesReportViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModels\ProductionMaterialsReportViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModels\MaterialsReportViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModels\OrderProductAddressDeliverySizesReportViewModel.cs" />
@@ -278,6 +281,7 @@
     <Compile Include="ViewModels\ReportViewModels\OrderProductAddressSizesReportViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModels\OrderProductMaterialsReportViewModel.cs" />
     <Compile Include="ViewModels\ReportViewModels\ProductDeliveriesReportViewModel.cs" />
+    <Compile Include="ViewModels\ReportViewModels\OrdersReportViewModel.cs" />
     <Compile Include="ViewModels\SizeViewModels\CreateSizeViewModel.cs" />
     <Compile Include="ViewModels\SizeViewModels\EditSizeViewModel.cs" />
     <Compile Include="ViewModels\SizeViewModels\SizeDetailsViewModel.cs" />
@@ -425,6 +429,10 @@
     <Content Include="Views\ProductionMaterialsReport\_ProductionMaterials.cshtml" />
     <Content Include="Views\MaterialAcceptancesReport\Index.cshtml" />
     <Content Include="Views\MaterialAcceptancesReport\_MaterialAcceptances.cshtml" />
+    <Content Include="Views\OrderProductAddressesReport\Index.cshtml" />
+    <Content Include="Views\OrderProductAddressesReport\_OrderProductAddresses.cshtml" />
+    <Content Include="Views\OrdersReport\Index.cshtml" />
+    <Content Include="Views\OrdersReport\_Orders.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
