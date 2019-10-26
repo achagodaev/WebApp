@@ -7,9 +7,9 @@ using WebApp.UI.Models;
 
 namespace WebApp.UI.ViewModels.ReportViewModels
 {
-    public class OrdersReportViewModel
+    public class ProductsReportViewModel
     {
-        public OrdersReportViewModel()
+        public ProductsReportViewModel()
         {
             Orders = new Dictionary<int, string>();
             Products = new Dictionary<int, string>();

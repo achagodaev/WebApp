@@ -19,9 +19,6 @@ namespace WebApp.UI.ViewModels.ReportViewModels
             OrderProductMaterials = new List<OrderProductMaterial>();
         }
 
-        [Display(Name = "Заказ")]
-        public int SelectedOrderId { get; set; }
-
         [Display(Name = "Продукция")]
         public int SelectedProductId { get; set; }
 

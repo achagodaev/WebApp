@@ -76,9 +76,14 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li>
-                                @Html.ActionLink("Заказы",
-                                    nameof(OrdersReportController.Index),
-                                    nameof(OrdersReportController).Replace("Controller", ""))
+                                @Html.ActionLink("Продукция",
+                                    nameof(ProductsReportController.Index),
+                                    nameof(ProductsReportController).Replace("Controller", ""))
+                            </li>
+                            <li>
+                                @Html.ActionLink("Грузополучатели",
+                                    nameof(AddressesReportController.Index),
+                                    nameof(AddressesReportController).Replace("Controller", ""))
                             </li>
                             <li>
                                 @Html.ActionLink("Материалы",

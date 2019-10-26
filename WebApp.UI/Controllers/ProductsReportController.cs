@@ -12,7 +12,7 @@ using WebApp.UI.Repositories;
 
 namespace WebApp.UI.Controllers
 {
-    public class OrdersReportController : Controller
+    public class ProductsReportController : Controller
     {
         private WebAppDbContext context = new WebAppDbContext();
 
@@ -21,9 +21,9 @@ namespace WebApp.UI.Controllers
             return View();
         }
 
-        public ActionResult _Orders(int productId = 0)
+        public ActionResult _Products(int productId = 0)
         {
-            OrdersReportViewModel model = new OrdersReportViewModel();
+            ProductsReportViewModel model = new ProductsReportViewModel();
 
             model.SelectedProductId = productId;
 
@@ -41,25 +41,23 @@ namespace WebApp.UI.Controllers
             {
                 orderProducts = orderProducts.Where(op => op.ProductId == productId);
                 orderProductAddresses = orderProductAddresses.Where(opa => opa.ProductId == productId);
-            }
 
-            if (orderProducts.Any())
-            {
-                foreach (var orderProduct in orderProducts)
+                if (orderProducts.Any())
                 {
-                    model.OrderProducts.Add(orderProduct);
+                    foreach (var orderProduct in orderProducts)
+                    {
+                        model.OrderProducts.Add(orderProduct);
+                    }
+                }
+
+                if (orderProductAddresses.Any())
+                {
+                    foreach (var orderProductAddress in orderProductAddresses)
+                    {
+                        model.OrderProductAddresses.Add(orderProductAddress);
+                    }
                 }
             }
-
-            if (orderProductAddresses.Any())
-            {
-                foreach (var orderProductMaterial in orderProductAddresses)
-                {
-                    model.OrderProductAddresses.Add(orderProductMaterial);
-                }
-            }
-
-            model.Orders.Add(0, "Все");
 
             if (context.Orders.Any())
             {
@@ -68,8 +66,6 @@ namespace WebApp.UI.Controllers
                     model.Orders.Add(order.Id, order.Name);
                 }
             }
-
-            model.Products.Add(0, "Все");
 
             if (context.Products.Any())
             {

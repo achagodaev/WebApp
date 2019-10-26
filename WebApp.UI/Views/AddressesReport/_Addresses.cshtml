@@ -1,0 +1,209 @@
+﻿@model WebApp.UI.ViewModels.ReportViewModels.AddressesReportViewModel
+@using WebApp.UI.Controllers
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-horizontal">
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SelectedAddressId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        @if (Model.SelectedAddressId == 0)
+                        {
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Выберите грузополучателя
+                                <span class="caret"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                @Model.Addresses[Model.SelectedAddressId]
+                                <span class="caret"></span>
+                            </button>
+                        }
+                        <ul class="dropdown-menu">
+                            @foreach (var address in Model.Addresses)
+                            {
+                                <li>
+                                    <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#addresses"
+                                       href="@Url.Action(nameof(AddressesReportController._Addresses), new { addressId = address.Key })">
+                                        @address.Value
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("Заказы", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+
+                    @if (Model.OrderProductAddresses.Any())
+                    {
+                        var orders = Model.OrderProductAddresses.GroupBy(opa => opa.OrderId);
+
+                        if (orders.Any())
+                        {
+                            var orderIndex = 0;
+
+                            foreach (var order in orders)
+                            {
+                                orderIndex++;
+
+                                <table class="table table-condensed table-bordered">
+                                    <tr class="active">
+                                        <th>
+                                            @orderIndex. @Model.Orders[order.Key]
+                                        </th>
+                                    </tr>
+                                </table>
+
+                                <div class="form-group">
+                                    @Html.Label("Продукция", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+
+                                        @{
+                                            var products = order.GroupBy(o => o.ProductId);
+
+                                            <table class="table table-condensed table-bordered">
+                                                <tr class="active">
+                                                    <th>Наименование</th>
+                                                    <th>Дата поставки</th>
+                                                    <th>Цена</th>
+                                                    <th>Количество</th>
+                                                    <th>Сумма</th>
+                                                </tr>
+
+                                                @if (products.Any())
+                                                {
+                                                    foreach (var product in products)
+                                                    {
+                                                        var orderProductAddress = Model.OrderProductAddresses
+                                                            .Single(opa => opa.OrderId == order.Key
+                                                            && opa.ProductId == product.Key
+                                                            && opa.AddressId == Model.SelectedAddressId);
+
+                                                        <tr>
+                                                            <td>
+                                                                @Model.Products[product.Key]
+                                                            </td>
+                                                            <td>
+                                                                @orderProductAddress.DeliveryDate.ToShortDateString()
+                                                            </td>
+                                                            <td>
+                                                                @orderProductAddress.OrderProduct.Price
+                                                            </td>
+                                                            <td>
+                                                                @orderProductAddress.OrderProductAddressSizes.Sum(opas => opas.Quantity)
+                                                            </td>
+                                                            <td>
+                                                                @orderProductAddress.OrderProductAddressSizes.Sum(opas => opas.Quantity * opas.OrderProductAddress.OrderProduct.Price)
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+                                                    <tr class="active">
+                                                        <th colspan="4">
+                                                            Всего: @products.Count()
+                                                        </th>
+                                                        <th>
+                                                            @products.Sum(product => product.Sum(opa => opa.OrderProductAddressSizes.Sum(s => s.OrderProductAddress.OrderProduct.Price * s.Quantity)))
+                                                        </th>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+                                                    <tr class="active">
+                                                        <td colspan="5">Нет продукции</td>
+                                                    </tr>
+                                                }
+
+                                            </table>
+                                        }
+
+                                    </div>
+                                </div>
+                            }
+
+                            <table class="table table-condensed table-bordered">
+                                <tr class="active">
+                                    <th>Всего</th>
+                                </tr>
+                            </table>
+
+                            <div class="form-group">
+                                @Html.Label("Продукция", htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+
+                                    @{
+                                        var _products = Model.OrderProductAddresses.GroupBy(opa => opa.ProductId);
+
+                                        <table class="table table-condensed table-bordered">
+                                            <tr class="active">
+                                                <th>Наименование</th>
+                                                <th>Количество</th>
+                                                <th>Сумма</th>
+                                            </tr>
+
+                                            @if (_products.Any())
+                                            {
+                                                foreach (var _product in _products)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @Model.Products[_product.Key]
+                                                        </td>
+                                                        <td>
+                                                            @_product.Sum(product => product.OrderProductAddressSizes.Sum(opas => opas.Quantity))
+                                                        </td>
+                                                        <td>
+                                                            @_product.Sum(product => product.OrderProductAddressSizes.Sum(opas => opas.Quantity * product.OrderProduct.Price))
+                                                        </td>
+                                                    </tr>
+                                                }
+
+                                                <tr class="active">
+                                                    <th>
+                                                        Всего: @_products.Count()
+                                                    </th>
+                                                    <th>
+                                                        @_products.Sum(product => product.Sum(opa => opa.OrderProductAddressSizes.Sum(s => s.Quantity)))
+                                                    </th>
+                                                    <th>
+                                                        @_products.Sum(product => product.Sum(opa => opa.OrderProductAddressSizes.Sum(s => s.OrderProductAddress.OrderProduct.Price * s.Quantity)))
+                                                    </th>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr class="active">
+                                                    <td colspan="3">Нет продукции</td>
+                                                </tr>
+                                            }
+
+                                        </table>
+                                    }
+
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <table class="table table-condensed table-bordered">
+                            <tr class="active">
+                                <td>Нет заказов</td>
+                            </tr>
+                        </table>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
