@@ -20,12 +20,12 @@ namespace WebApp.UI.Controllers
             return View();
         }
 
-        public ActionResult _OrderProductAddresses(int orderId = 0, string groupBy = "product", string sortColumn = "name")
+        public ActionResult _OrderProductAddresses(int orderId = 0, string groupColumn = "product")
         {
             OrderProductAddressesReportViewModel model = new OrderProductAddressesReportViewModel();
 
             model.SelectedOrderId = orderId;
-            model.SelectedGroupBy = groupBy;
+            model.SelectedGroupColumn = groupColumn;
 
             IQueryable<OrderProduct> orderProducts = context.OrderProducts
                 .Include(op => op.Order)

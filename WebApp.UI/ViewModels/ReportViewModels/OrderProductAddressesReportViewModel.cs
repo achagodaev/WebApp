@@ -22,7 +22,7 @@ namespace WebApp.UI.ViewModels.ReportViewModels
         public int SelectedOrderId { get; set; }
 
         [Display(Name = "Группировка")]
-        public string SelectedGroupBy { get; set; }
+        public string SelectedGroupColumn { get; set; }
 
         public Dictionary<int, string> Orders { get; set; }
 

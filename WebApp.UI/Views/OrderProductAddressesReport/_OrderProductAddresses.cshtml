@@ -28,7 +28,7 @@
                             {
                                 <li>
                                     <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddresses"
-                                       href="@Url.Action(nameof(OrderProductAddressesReportController._OrderProductAddresses), new { orderId = order.Key, groupBy = Model.SelectedGroupBy })">
+                                       href="@Url.Action(nameof(OrderProductAddressesReportController._OrderProductAddresses), new { orderId = order.Key, groupColumn = Model.SelectedGroupColumn })">
                                         @order.Value
                                     </a>
                                 </li>
@@ -41,13 +41,13 @@
             @if (Model.OrderProducts.Any())
             {
                 <div class="form-group">
-                    @Html.LabelFor(model => model.SelectedGroupBy, htmlAttributes: new { @class = "control-label col-md-2" })
+                    @Html.LabelFor(model => model.SelectedGroupColumn, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
                         <div class="btn-group">
-                            @if (Model.SelectedGroupBy == "product")
+                            @if (Model.SelectedGroupColumn == "product")
                             {
                                 <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddresses" class="btn btn-primary"
-                                   href="@Url.Action(nameof(OrderProductAddressesReportController._OrderProductAddresses), new { orderId = Model.SelectedOrderId, groupBy = "product" })">
+                                   href="@Url.Action(nameof(OrderProductAddressesReportController._OrderProductAddresses), new { orderId = Model.SelectedOrderId, groupColumn = "product" })">
                                     По продукции
                                 </a>
 
@@ -55,15 +55,15 @@
                             else
                             {
                                 <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddresses" class="btn btn-default"
-                                   href="@Url.Action(nameof(OrderProductAddressesReportController._OrderProductAddresses), new { orderId = Model.SelectedOrderId, groupBy = "product" })">
+                                   href="@Url.Action(nameof(OrderProductAddressesReportController._OrderProductAddresses), new { orderId = Model.SelectedOrderId, groupColumn = "product" })">
                                     По продукции
                                 </a>
                             }
 
-                            @if (Model.SelectedGroupBy == "address")
+                            @if (Model.SelectedGroupColumn == "address")
                             {
                                 <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddresses" class="btn btn-primary"
-                                   href="@Url.Action(nameof(OrderProductAddressesReportController._OrderProductAddresses), new { orderId = Model.SelectedOrderId, groupBy = "address" })">
+                                   href="@Url.Action(nameof(OrderProductAddressesReportController._OrderProductAddresses), new { orderId = Model.SelectedOrderId, groupColumn = "address" })">
                                     По грузополучателям
                                 </a>
 
@@ -71,7 +71,7 @@
                             else
                             {
                                 <a data-ajax="true" data-ajax-mode="replace" data-ajax-update="#orderProductAddresses" class="btn btn-default"
-                                   href="@Url.Action(nameof(OrderProductAddressesReportController._OrderProductAddresses), new { orderId = Model.SelectedOrderId, groupBy = "address" })">
+                                   href="@Url.Action(nameof(OrderProductAddressesReportController._OrderProductAddresses), new { orderId = Model.SelectedOrderId, groupColumn = "address" })">
                                     По грузополучателям
                                 </a>
                             }
@@ -80,7 +80,7 @@
                 </div>
             }
 
-            @if (Model.SelectedGroupBy == "product")
+            @if (Model.SelectedGroupColumn == "product")
             {
                 <div class="form-group">
                     @Html.Label("Продукция", htmlAttributes: new { @class = "control-label col-md-2" })
@@ -196,7 +196,7 @@
                 </div>
             }
 
-            @if (Model.SelectedGroupBy == "address")
+            @if (Model.SelectedGroupColumn == "address")
             {
                 <div class="form-group">
                     @Html.Label("Грузополучатели", htmlAttributes: new { @class = "control-label col-md-2" })
